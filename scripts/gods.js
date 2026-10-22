@@ -145,6 +145,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       cancelEdit: function () { return this.cancelEdit(); },
       saveGod: function () { return this.saveGod(); },
       chooseImage: function () { return this.chooseImage(); },
+      deityImageAction: function () { return this.deityImageAction(); },
       exportGods: function () { return this.exportGods(); },
       importGods: function () { return this.element.querySelector('[data-role="import-file"]')?.click(); }
     }
@@ -406,6 +407,74 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       console.error("Gods | Delete failed", error);
       ui.notifications.error("Could not delete the deity.");
     }
+  }
+
+  getSelectedDeity() {
+    return this.entries.find(entry => entry.id === this.selectedId) || null;
+  }
+
+  async deityImageAction() {
+    if (!hasAccess() || !isSupported()) return;
+    const deity = this.getSelectedDeity();
+    if (!deity) return;
+
+    // Only the public-facing name and image are shown. Never expose hidden GM fields.
+    const name = deity.name || "Deity";
+    const src = deity.image || IMAGE_FALLBACK;
+    const escapedName = Handlebars.escapeExpression(name);
+    const escapedSrc = Handlebars.escapeExpression(src);
+    try {
+      const choice = await DialogV2.wait({
+        window: { title: name + " — Image Actions" },
+        content: `<div class="gods-image-menu">
+          <p>Choose how to display <strong>${escapedName}</strong>'s portrait.</p>
+          <img class="gods-image-menu-preview" alt="${escapedName}" src="${escapedSrc}">
+        </div>`,
+        buttons: [
+          { action: "open", label: "Open Image", icon: "fa-solid fa-up-right-from-square" },
+          { action: "chat", label: "Send to Chat", icon: "fa-solid fa-comments" },
+          { action: "players", label: "Show to Players", icon: "fa-solid fa-eye" },
+          { action: "cancel", label: "Cancel", icon: "fa-solid fa-xmark" }
+        ],
+        rejectClose: false
+      });
+      if (choice === "open") {
+        await this.openDeityImage(src, name, false);
+      } else if (choice === "chat") {
+        await this.sendDeityImageToChat(src, name);
+        ui.notifications.info(name + " image sent to the public chat.");
+      } else if (choice === "players") {
+        await this.openDeityImage(src, name, true);
+        ui.notifications.info(name + " image shared with connected players.");
+      }
+    } catch (error) {
+      console.error("Gods | Image action failed", error);
+      ui.notifications.error("Unable to display or share this deity image. Check the console.");
+    }
+  }
+
+  async openDeityImage(src, title, showPlayers = false) {
+    if (!hasAccess() || !isSupported()) return;
+    // Foundry V14 takes ONE options object, unlike legacy ImagePopout versions.
+    const ImagePopout = foundry.applications.apps.ImagePopout;
+    const popout = new ImagePopout({ src, window: { title } });
+    await popout.render(true);
+    if (showPlayers) popout.shareImage();
+  }
+
+  async sendDeityImageToChat(src, title) {
+    if (!hasAccess() || !isSupported()) return;
+    const safeTitle = Handlebars.escapeExpression(title);
+    const safeSrc = Handlebars.escapeExpression(src);
+    // Force public delivery even when the GM's roll mode is set to whisper.
+    await ChatMessage.create({
+      user: game.user.id,
+      speaker: ChatMessage.getSpeaker({ alias: "Divine Codex" }),
+      whisper: [],
+      blind: false,
+      content: `<div class="gods-chat-portrait"><h3>${safeTitle}</h3>
+        <img alt="${safeTitle}" src="${safeSrc}" style="max-width:100%;height:auto;border-radius:7px;"></div>`
+    });
   }
 
   exportGods() {
