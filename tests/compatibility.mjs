@@ -110,7 +110,7 @@ assert.equal(createCount, 1);
 assert.equal(game.journal.contents.length, 1);
 assert.equal(game.journal.contents[0].ownership.default, 0);
 assert.ok(game.journal.contents[0].flags.gods.records.length >= 30);
-assert.equal(game.journal.contents[0].flags.gods.schema, 2);
+assert.equal(game.journal.contents[0].flags.gods.schema, 3);
 await game.gods.open();
 assert.equal(createCount, 1, "Never overwrite old data");
 
@@ -124,7 +124,7 @@ oldSelune.title = "GM's custom title";
 oldSelune.history = "GM's private custom history";
 db.flags.gods.schema = 1;
 await game.gods.open();
-assert.equal(db.flags.gods.schema, 2, "Older world should migrate");
+assert.equal(db.flags.gods.schema, 3, "Older world should migrate");
 const newSelune = db.flags.gods.records.find(god => god.id === "selune");
 assert.match(newSelune.summary, /Lady of Silver/, "Unedited old Bulgarian seed becomes English");
 assert.equal(newSelune.title, "GM's custom title", "Custom fields are never overwritten");
@@ -133,28 +133,61 @@ assert.equal(createCount, 1, "Existing Journal must never be recreated");
 
 const MenuApp = menus.get("gods.openCodex").type;
 
-// Campaign story relevance must outrank the old alphabetical and pantheon sorting.
+// The Obsidian tier hierarchy, not story importance, determines the display order.
 const priorityApp = new MenuApp();
 const ranked = await priorityApp._prepareContext({});
+const { POWER_HIERARCHY } = await import("../data/power-hierarchy.js");
+assert.equal(ranked.entries.length, 53, "34 legacy gods plus 19 missing Obsidian entries");
+const exact = POWER_HIERARCHY.tiers.flatMap(group => group.deities);
+assert.equal(exact.length, 31, "31 gods have specified power tiers in Obsidian");
 assert.deepEqual(
-  ranked.entries.slice(0, 7).map(entry => entry.id),
-  ["ragamodji", "asmodeus", "fujin", "izanami", "hikari", "selune", "raven-queen"]
+  ranked.entries.filter(e => e.divineTier !== "Unranked").map(e => e.id), exact,
+  "All ranked deities follow the precise Obsidian hierarchy and within-tier order"
 );
-assert.equal(ranked.entries[0].importance, "100");
-assert.equal(ranked.entries[0].importanceBand, "Main Story");
-assert.equal(ranked.entries[6].importanceBand, "Character Connection");
-assert.equal(ranked.entries.length, 34);
-// GM priority changes must be persisted to the private Journal and used immediately.
+assert.deepEqual(ranked.entries.slice(0, 3).map(e => e.name), ["Izanagi","Izanami","Amaterasu"]);
+assert.equal(ranked.entries.find(e => e.id === "izanami").divineTier, "Primordial Powers");
+assert.equal(ranked.entries.find(e => e.id === "asmodeus").divineTier, "Major Gods");
+assert.equal(ranked.entries.find(e => e.id === "ragamodji").divineTier, "Lesser Gods");
+assert.equal(ranked.entries.filter(e => e.divineTier === "Unranked").length, 22);
+
+// A prior story-importance override must no longer change power-tier order.
 await priorityApp.persist(records => {
   const selune = records.find(entry => entry.id === "selune");
-  selune.importance = "99";
+  selune.importance = "100";
   return records;
 });
-const rankAfterUpdate = await priorityApp._prepareContext({});
-assert.equal(rankAfterUpdate.entries[0].id, "ragamodji");
-assert.equal(rankAfterUpdate.entries[1].id, "selune");
-assert.equal(rankAfterUpdate.entries[1].importance, "99");
+let rankAfterUpdate = await priorityApp._prepareContext({});
+assert.equal(rankAfterUpdate.entries[0].id, "izanagi");
+assert.equal(rankAfterUpdate.entries.find(e => e.id === "selune").divineTier, "Major Gods");
+
+// GM controls can override a tier without losing descriptions or private notes.
+await priorityApp.persist(records => {
+  const selune = records.find(entry => entry.id === "selune");
+  selune.divineTier = "Primordial Powers";
+  selune.tierPosition = "1";
+  return records;
+});
+rankAfterUpdate = await priorityApp._prepareContext({});
+assert.deepEqual(rankAfterUpdate.entries.slice(0, 3).map(e => e.id), ["izanagi","selune","izanami"]);
 assert.equal(rankAfterUpdate.entries.find(e => e.id === "selune").history, "GM's private custom history");
+assert.equal(rankAfterUpdate.editGroups[0].fields.find(e => e.key === "divineTier").tierSelect, true);
+
+// The schema-2 to schema-3 migration must append only missing Obsidian gods.
+const savedRecords = [...db.flags.gods.records];
+db.flags.gods.records = savedRecords.filter(e => e.id !== "izanagi");
+db.flags.gods.schema = 2;
+await game.gods.open();
+assert.equal(db.flags.gods.schema, 3);
+assert.equal(db.flags.gods.records.filter(e => e.id === "izanagi").length, 1);
+assert.equal(db.flags.gods.records.find(e => e.id === "selune").history, "GM's private custom history");
+
+// Restore original rank for further navigation tests.
+await priorityApp.persist(records => {
+  const selune = records.find(entry => entry.id === "selune");
+  delete selune.divineTier;
+  delete selune.tierPosition;
+  return records;
+});
 
 // Regression: clicking a deity after scrolling down the list must NOT reset it to the first item.
 const makeScrollable = (start = 0) => ({
@@ -267,4 +300,4 @@ await game.gods.open();
 assert.equal(createCount, 1, "Player cannot create journal");
 assert.equal(notices.errors.length, 0);
 
-console.log("PASS: Foundry V14 + dnd5e 5.3.3; scene-controls icon GM-only; deity scroll persists; English migration preserves DM edits; incompatible versions blocked.");
+console.log("PASS: Foundry V14 + dnd5e 5.3.3; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");
