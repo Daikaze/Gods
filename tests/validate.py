@@ -68,7 +68,7 @@ assert 'divineTier' in template and 'tierHeader' in template
 assert 'tierOptions' in js and 'Position in Tier' in js
 # Preserve the exact number and original within-tier sequence from the Obsidian note.
 ranks = (ROOT / "data" / "power-hierarchy.js").read_text(encoding="utf-8")
-ranks_match = re.search(r'export const POWER_HIERARCHY = (\\{.*\\});\\s*$', ranks, re.DOTALL)
+ranks_match = re.search(r'export const POWER_HIERARCHY = (\{.*\});\s*$', ranks, re.DOTALL)
 assert ranks_match
 hierarchy = json.loads(ranks_match.group(1))
 assert [tier["tier"] for tier in hierarchy["tiers"]] == [
@@ -82,12 +82,12 @@ expected = [
 ]
 assert [tier["deities"] for tier in hierarchy["tiers"]] == expected
 additions = (ROOT / "data" / "obsidian-deities.js").read_text(encoding="utf-8")
-extras_match = re.search(r'export const OBSIDIAN_DEITIES = (\\[.*\\]);\\s*$', additions, re.DOTALL)
+extras_match = re.search(r'export const OBSIDIAN_DEITIES = (\[.*\]);\s*$', additions, re.DOTALL)
 assert extras_match
 extra_data = json.loads(extras_match.group(1))
 assert len(extra_data) == 19
 all_ids = {god["id"] for god in deities} | {god["id"] for god in extra_data}
 assert len(all_ids) == 53
 assert set(sum(expected, [])) <= all_ids, "Every power-ranked god must be present."
-assert not re.search(r"[\\u0400-\\u04FF]", additions), "New entries must be in English."
+assert not re.search(r"[\u0400-\u04FF]", additions), "New entries must be in English."
 print("OK: manifest, %d deity portraits, GM access controls, UI actions." % len(deities))
