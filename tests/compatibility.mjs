@@ -133,6 +133,29 @@ assert.equal(createCount, 1, "Existing Journal must never be recreated");
 
 const MenuApp = menus.get("gods.openCodex").type;
 
+// Campaign story relevance must outrank the old alphabetical and pantheon sorting.
+const priorityApp = new MenuApp();
+const ranked = await priorityApp._prepareContext({});
+assert.deepEqual(
+  ranked.entries.slice(0, 7).map(entry => entry.id),
+  ["ragamodji", "asmodeus", "fujin", "izanami", "hikari", "selune", "raven-queen"]
+);
+assert.equal(ranked.entries[0].importance, "100");
+assert.equal(ranked.entries[0].importanceBand, "Main Story");
+assert.equal(ranked.entries[6].importanceBand, "Character Connection");
+assert.equal(ranked.entries.length, 34);
+// GM priority changes must be persisted to the private Journal and used immediately.
+await priorityApp.persist(records => {
+  const selune = records.find(entry => entry.id === "selune");
+  selune.importance = "99";
+  return records;
+});
+const rankAfterUpdate = await priorityApp._prepareContext({});
+assert.equal(rankAfterUpdate.entries[0].id, "ragamodji");
+assert.equal(rankAfterUpdate.entries[1].id, "selune");
+assert.equal(rankAfterUpdate.entries[1].importance, "99");
+assert.equal(rankAfterUpdate.entries.find(e => e.id === "selune").history, "GM's private custom history");
+
 // Regression: clicking a deity after scrolling down the list must NOT reset it to the first item.
 const makeScrollable = (start = 0) => ({
   scrollTop: start,
