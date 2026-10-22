@@ -38,6 +38,7 @@ assert 'restricted: true' in js, "Menu must be GM-only."
 assert 'hasAccess()' in js, "All mutations must be GM-gated."
 assert 'ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE }' in js, "Journal must be private."
 template = (ROOT / "templates" / "codex.hbs").read_text(encoding="utf-8")
-for action in ("selectGod", "addGod", "saveGod", "deleteGod", "importGods", "exportGods"):
+for action in ("selectGod", "addGod", "deleteGod", "importGods", "exportGods"):
     assert 'data-action="' + action + '"' in template
+assert "data-gods-editor" in template and 'type="submit"' in template
 print("OK: manifest, %d deity portraits, GM access controls, UI actions." % len(deities))
