@@ -1,0 +1,56 @@
+name: Publish Foundry Module
+on:
+  push:
+    branches: [main]
+    paths: [module.json]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source
+        run: |
+          node --check scripts/gods.js
+          node --check data/deities.js
+          python3 tests/validate.py
+          node tests/compatibility.mjs
+      - name: Build self-contained module archive
+        run: |
+          set -eu
+          VERSION="$(python3 -c 'import json; print(json.load(open("module.json"))["version"])')"
+          test -n "$VERSION"
+          printf "VERSION=%s\n" "$VERSION" >> "$GITHUB_ENV"
+          zip -q -r "gods-v${VERSION}.zip" module.json scripts/ styles/ templates/ data/ assets/ README.md
+          python3 - <<'PY'
+          import io, json, pathlib, zipfile
+          manifest = json.loads(pathlib.Path("module.json").read_text(encoding="utf-8"))
+          archive = pathlib.Path("gods-v" + manifest["version"] + ".zip")
+          with zipfile.ZipFile(archive) as z:
+              assert z.testzip() is None
+              names = set(z.namelist())
+              assert "module.json" in names
+              assert all(path in names for path in manifest["esmodules"] + manifest["styles"])
+              assert "templates/codex.hbs" in names
+              assert "data/deities.js" in names
+              assert "assets/deities/unknown.svg" in names
+              assert json.loads(z.read("module.json")) == manifest
+          print("Validated Foundry install ZIP:", archive)
+          PY
+      - name: Publish immutable versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          TAG="v${VERSION}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; refusing to silently replace it." >&2
+            exit 1
+          fi
+          gh release create "$TAG" "gods-v${VERSION}.zip" --target "$GITHUB_SHA" \
+            --title "Gods — Divine Codex $TAG (Foundry V14 / D&D5e 5.3.3)" \
+            --notes "GM-only deity encyclopedia. Requires Foundry V14 and dnd5e 5.3.3. Includes 34 gods and 35 local SVG images."

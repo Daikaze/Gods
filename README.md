@@ -18,6 +18,8 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
+Alternatively, download the packaged [v0.1.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.1.1/gods-v0.1.1.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
 
 ## Included features (v0.1.1)
