@@ -18,9 +18,19 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.1/gods-v0.2.1.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.2/gods-v0.2.2.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
+
+## New in v0.2.2
+
+- **Readable pantheon filter:** native dropdown is explicitly dark-themed, with high-contrast option text and selected-row colors for Firefox and Chromium.
+- **Portrait actions (GM-only):** click the large portrait in any deity profile and choose **Open Image**, **Send to Chat**, **Show to Players**, or **Cancel**.
+- **Open Image:** uses the Foundry V14 ImagePopout application, visible only to the GM who opens it.
+- **Send to Chat:** posts the deity's name and image as a public message, regardless of the GM's private roll mode. This does not send the deity description, secret fields, or GM notes.
+- **Show to Players:** uses Foundry V14's built-in ImagePopout.shareImage, so the selected portrait appears for connected players; no chat post is created.
+- The menu is usable with keyboard or pointer. All existing deity records remain unchanged.
+- Automated tests exercise every portrait action, HTML escaping, public delivery, and the scroll fix. Live Foundry-world visual testing is still recommended.
 
 ## Fixed in v0.2.1
 
