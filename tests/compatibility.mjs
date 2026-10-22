@@ -115,6 +115,57 @@ assert.equal(newSelune.history, "GM's private custom history", "GM-authored hist
 assert.equal(createCount, 1, "Existing Journal must never be recreated");
 
 const MenuApp = menus.get("gods.openCodex").type;
+
+// Regression: clicking a deity after scrolling down the list must NOT reset it to the first item.
+const makeScrollable = (start = 0) => ({
+  scrollTop: start,
+  listeners: {},
+  addEventListener(event, handler) { this.listeners[event] = handler; },
+  scrollTo(top) { this.scrollTop = top; },
+  simulateScroll(top) { this.scrollTop = top; this.listeners.scroll?.(); }
+});
+const makeShell = (list, details) => ({
+  querySelector(selector) {
+    if (selector === ".gods-list") return list;
+    if (selector === ".gods-main") return details;
+    return null;
+  },
+  querySelectorAll() { return []; }
+});
+
+const nav = new MenuApp();
+nav.entries = db.flags.gods.records.map(god => ({ ...god }));
+nav.selectedId = "selune";
+nav.search = "moon";
+nav.pantheon = "Averis";
+const oldList = makeScrollable(620);
+const oldDetail = makeScrollable(850);
+nav.element = makeShell(oldList, oldDetail);
+await nav.selectGod("fujin");
+assert.equal(nav.selectedId, "fujin");
+assert.equal(nav._listScrollTop, 620, "Scroll position must be captured before render");
+assert.equal(nav._detailScrollTop, 0, "New deity details should start at the top");
+const newList = makeScrollable(0);
+const newDetail = makeScrollable(0);
+nav.element = makeShell(newList, newDetail);
+nav._onRender({}, {});
+assert.equal(newList.scrollTop, 620, "List should return to precisely its former scroll offset");
+assert.equal(newDetail.scrollTop, 0, "New deity profile should open at its start");
+assert.equal(nav.search, "moon", "Search input persists");
+assert.equal(nav.pantheon, "Averis", "Pantheon filter persists");
+newList.simulateScroll(730);
+newDetail.simulateScroll(315);
+const reopenedList = makeScrollable(0);
+const reopenedDetail = makeScrollable(0);
+nav.element = makeShell(reopenedList, reopenedDetail);
+nav._onRender({}, {});
+assert.equal(reopenedList.scrollTop, 730, "List stays in place after re-opening the window");
+assert.equal(reopenedDetail.scrollTop, 315, "Detail scroll also survives a plain rerender");
+// Clicking the already-selected deity must not force any rerender.
+const priorRenderFlag = nav.rendered;
+await nav.selectGod("fujin");
+assert.equal(nav.rendered, priorRenderFlag);
+
 assert.notEqual(new MenuApp()._canRender({}), false, "GM on correct version can render");
 
 game.system.version = "6.0.0";
@@ -144,4 +195,4 @@ await game.gods.open();
 assert.equal(createCount, 1, "Player cannot create journal");
 assert.equal(notices.errors.length, 0);
 
-console.log("PASS: Foundry V14 + dnd5e 5.3.3; scene-controls icon GM-only; English migration preserves DM edits; incompatible versions blocked.");
+console.log("PASS: Foundry V14 + dnd5e 5.3.3; scene-controls icon GM-only; deity scroll persists; English migration preserves DM edits; incompatible versions blocked.");
