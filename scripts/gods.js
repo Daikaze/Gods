@@ -1,4 +1,5 @@
 import { SEED_DEITIES } from "../data/deities.js";
+import { LEGACY_DEITIES } from "../data/legacy.js";
 
 const MODULE = "gods";
 const SUPPORTED_FOUNDRY_GENERATION = 14;
@@ -9,36 +10,36 @@ const IMAGE_FALLBACK = "modules/gods/assets/deities/unknown.svg";
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
 const EDIT_GROUPS = [
-  { title: "Основна информация", fields: [
-    ["name", "Име", false], ["aliases", "Други имена / титли", false],
-    ["title", "Титла", false], ["pantheon", "Пантеон / свят", false],
-    ["category", "Вид / ранг", false], ["alignment", "Alignment", false],
-    ["domains", "Домейни и сфери на влияние", false],
-    ["symbol", "Свещен символ", false], ["plane", "Дом / план", false],
-    ["summary", "Кратко описание", true]
+  { title: "Identity and Portfolio", fields: [
+    ["name", "Name", false], ["aliases", "Other Names and Epithets", false],
+    ["title", "Divine Title", false], ["pantheon", "Pantheon / Setting", false],
+    ["category", "Divine Rank / Type", false], ["alignment", "Alignment", false],
+    ["domains", "Domains and Spheres of Influence", false],
+    ["symbol", "Holy Symbol", false], ["plane", "Divine Realm / Plane", false],
+    ["summary", "Overview", true]
   ]},
-  { title: "Легенди и същност", fields: [
-    ["appearance", "Външен вид", true], ["personality", "Характер и мотиви", true],
-    ["history", "История и произход", true], ["doctrine", "Учение / заповеди", true],
-    ["powers", "Сили, проявления и чудеса", true],
-    ["manifestations", "Аватари и знамения", true]
+  { title: "Myths and Divine Nature", fields: [
+    ["appearance", "Appearance", true], ["personality", "Personality and Motives", true],
+    ["history", "History and Origins", true], ["doctrine", "Teachings and Commandments", true],
+    ["powers", "Powers and Miracles", true],
+    ["manifestations", "Avatars, Omens, and Signs", true]
   ]},
-  { title: "Вяра и последователи", fields: [
-    ["worship", "Как се почита", true], ["clergy", "Жреци и ордени", true],
-    ["followers", "Последователи", true], ["temples", "Храмове и свети места", true],
-    ["holyDays", "Празници, молитви, ритуали", true],
-    ["offerings", "Дарове и жертвоприношения", true]
+  { title: "Faith and Followers", fields: [
+    ["worship", "Worship and Devotion", true], ["clergy", "Priests and Orders", true],
+    ["followers", "Followers", true], ["temples", "Temples and Holy Places", true],
+    ["holyDays", "Festivals, Prayers, and Rituals", true],
+    ["offerings", "Offerings and Sacrifices", true]
   ]},
-  { title: "Връзки и приключения", fields: [
-    ["allies", "Съюзници", true], ["enemies", "Врагове", true],
-    ["relationships", "Връзки с други богове", true],
-    ["artifacts", "Реликви и артефакти", true],
-    ["blessings", "Благословии и награди", true],
-    ["questHooks", "Идеи за куестове", true]
+  { title: "Relationships and Adventures", fields: [
+    ["allies", "Allies", true], ["enemies", "Enemies", true],
+    ["relationships", "Relationships with Other Deities", true],
+    ["artifacts", "Relics and Artifacts", true],
+    ["blessings", "Blessings and Rewards", true],
+    ["questHooks", "Adventure Hooks", true]
   ]},
-  { title: "Само за DM — тайни", fields: [
-    ["secrets", "Скрита истина / сюжетни обрати", true],
-    ["dmNotes", "DM бележки", true]
+  { title: "GM Only — Secrets", fields: [
+    ["secrets", "Hidden Truths and Plot Twists", true],
+    ["dmNotes", "GM Notes", true]
   ]}
 ];
 const KEYS = EDIT_GROUPS.flatMap(group => group.fields.map(field => field[0]));
@@ -46,6 +47,26 @@ const DETAIL_GROUPS = EDIT_GROUPS.slice(1, -1);
 const text = value => String(value ?? "").trim();
 const normalize = value => text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
 const hasAccess = () => Boolean(game.user?.isGM);
+const DATABASE_SCHEMA = 2;
+
+/** Migrate only fields identical to the original starter pack, preserving all GM edits. */
+function migrateLegacyRecords(records) {
+  const originals = new Map(LEGACY_DEITIES.map(record => [record.id, record]));
+  const currentSeeds = new Map(seedRecords().map(record => [record.id, record]));
+  return records.map(record => {
+    const legacy = originals.get(record.id);
+    const replacement = currentSeeds.get(record.id);
+    if (!legacy || !replacement) return record; // Preserve all custom/imported deities.
+    const next = { ...record };
+    for (const key of KEYS) {
+      // A non-empty field manually edited or deliberately cleared stays as it was.
+      if (text(record[key]) === text(legacy[key])) {
+        next[key] = replacement[key];
+      }
+    }
+    return next;
+  });
+}
 
 /**
  * Supported deployment: Foundry VTT generation 14 with D&D 5e system 5.3.3.
@@ -65,9 +86,9 @@ function compatibility() {
 const isSupported = () => compatibility().supported;
 const unsupportedMessage = () => {
   const { generation, system, version } = compatibility();
-  return "Gods изисква Foundry V14 + D&D5e 5.3.3. Текущо: Foundry "
-    + (Number.isFinite(generation) ? "V" + generation : "неизвестна версия")
-    + ", " + (system || "неизвестна система") + " " + (version || "неизвестна версия") + ".";
+  return "Gods requires Foundry V14 and D&D5e 5.3.3. Current: Foundry "
+    + (Number.isFinite(generation) ? "V" + generation : "unknown version")
+    + ", " + (system || "unknown system") + " " + (version || "unknown version") + ".";
 };
 const newId = () => "deity-" + foundry.utils.randomID(16);
 
@@ -88,14 +109,25 @@ function database() {
 }
 
 async function ensureDatabase() {
-  if (!hasAccess()) throw new Error("Gods е достъпен само за GM.");
+  if (!hasAccess()) throw new Error("Gods is available to the GM only.");
   if (!isSupported()) throw new Error(unsupportedMessage());
   const existing = database();
-  if (existing) return existing;
+  if (existing) {
+    const schema = Number(existing.getFlag(MODULE, "schema") || 1);
+    if (schema < DATABASE_SCHEMA) {
+      const records = existing.getFlag(MODULE, "records") || [];
+      await existing.update({
+        ["flags." + MODULE + ".records"]: migrateLegacyRecords(records),
+        ["flags." + MODULE + ".schema"]: DATABASE_SCHEMA
+      });
+      console.info("Gods | Database upgraded to schema " + DATABASE_SCHEMA + " (GM changes preserved)");
+    }
+    return existing;
+  }
   return JournalEntry.create({
     name: DB_NAME,
     ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE },
-    flags: { [MODULE]: { database: true, schema: 1, records: seedRecords() } }
+    flags: { [MODULE]: { database: true, schema: DATABASE_SCHEMA, records: seedRecords() } }
   });
 }
 
@@ -143,7 +175,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       const aCampaign = a.pantheon === "Averis";
       const bCampaign = b.pantheon === "Averis";
       if (aCampaign !== bCampaign) return aCampaign ? -1 : 1;
-      return a.name.localeCompare(b.name, "bg");
+      return a.name.localeCompare(b.name, "en");
     });
     if (!this.selectedId || !this.entries.some(entry => entry.id === this.selectedId)) {
       this.selectedId = this.entries[0]?.id ?? null;
@@ -157,8 +189,8 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     })).filter(group => group.fields.length) : [];
     if (display?.secrets || display?.dmNotes) {
       groups.push({
-        title: "Само за DM — тайни",
-        fields: [["secrets", "Скрита истина"], ["dmNotes", "DM бележки"]]
+        title: "GM Only — Secrets",
+        fields: [["secrets", "Hidden Truths"], ["dmNotes", "GM Notes"]]
           .filter(field => display[field[0]]).map(field => ({ label: field[1], value: display[field[0]] }))
       });
     }
@@ -231,7 +263,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 
   addGod() {
     if (!hasAccess()) return;
-    this.draft = cleanRecord({ id: newId(), pantheon: "Averis", category: "Божество" });
+    this.draft = cleanRecord({ id: newId(), pantheon: "Averis", category: "Deity" });
     this.editing = true;
     return this.render();
   }
@@ -249,7 +281,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!hasAccess()) return;
     const selected = this.entries.find(entry => entry.id === this.selectedId);
     if (!selected) return;
-    this.draft = { ...selected, id: newId(), name: selected.name + " (копие)" };
+    this.draft = { ...selected, id: newId(), name: selected.name + " (copy)" };
     this.editing = true;
     return this.render();
   }
@@ -276,7 +308,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async persist(change) {
-    if (!hasAccess()) throw new Error("Само GM може да записва.");
+    if (!hasAccess()) throw new Error("Only the GM can save deity records.");
     const db = await ensureDatabase();
     const current = (db.getFlag(MODULE, "records") || []).map(cleanRecord);
     const updated = change(current);
@@ -290,7 +322,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     const values = Object.fromEntries(new FormData(form).entries());
     const updated = cleanRecord({ ...values, id: this.draft.id });
     if (!updated.name) {
-      ui.notifications.warn("Въведи име на божеството.");
+      ui.notifications.warn("Enter a deity name.");
       form.querySelector('[name="name"]')?.focus();
       return;
     }
@@ -304,11 +336,11 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       this.selectedId = updated.id;
       this.editing = false;
       this.draft = null;
-      ui.notifications.info("Божеството е записано.");
+      ui.notifications.info("Deity saved.");
       await this.render();
     } catch (error) {
       console.error("Gods | Failed to save deity", error);
-      ui.notifications.error("Неуспешен запис. Провери конзолата.");
+      ui.notifications.error("Could not save the deity. Check the console.");
     }
   }
 
@@ -317,8 +349,8 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     const selected = this.entries.find(entry => entry.id === this.selectedId);
     if (!selected) return;
     const confirmed = await DialogV2.confirm({
-      window: { title: "Изтриване на божество" },
-      content: "<p>Да изтрия ли <strong>" + Handlebars.escapeExpression(selected.name) + "</strong>? Това не може да се върне.</p>",
+      window: { title: "Delete Deity" },
+      content: "<p>Delete <strong>" + Handlebars.escapeExpression(selected.name) + "</strong>? This cannot be undone.</p>",
       rejectClose: false
     });
     if (!confirmed) return;
@@ -326,10 +358,10 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       await this.persist(records => records.filter(entry => entry.id !== selected.id));
       this.selectedId = null;
       await this.render();
-      ui.notifications.info("Божеството е изтрито.");
+      ui.notifications.info("Deity deleted.");
     } catch (error) {
       console.error("Gods | Delete failed", error);
-      ui.notifications.error("Неуспешно изтриване.");
+      ui.notifications.error("Could not delete the deity.");
     }
   }
 
@@ -366,11 +398,11 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
         for (const entry of imported) merged.set(entry.id, entry);
         return [...merged.values()];
       });
-      ui.notifications.info("Импортирани/обновени записи: " + imported.length);
+      ui.notifications.info("Imported or updated: " + imported.length + " deity records.");
       await this.render();
     } catch (error) {
       console.error("Gods | Import failed", error);
-      ui.notifications.error("Файлът не може да се импортира.");
+      ui.notifications.error("Could not import the selected file.");
     }
   }
 }
@@ -389,9 +421,33 @@ async function openCodex() {
     codex.bringToFront();
   } catch (error) {
     console.error("Gods | Failed to open Codex", error);
-    ui.notifications.error("Gods не може да се отвори. Провери конзолата.");
+    ui.notifications.error("Unable to open Gods. Check the console.");
   }
 }
+
+// Native Foundry V14 Scene Controls — matching the two-column toolbar.
+Hooks.on("getSceneControlButtons", controls => {
+  if (!hasAccess() || !isSupported()) return;
+  controls.gods = {
+    name: "gods",
+    title: "Gods — Divine Codex",
+    icon: "fa-solid fa-book-open",
+    order: Object.keys(controls).length + 50,
+    visible: true,
+    onChange: (_event, active) => { if (active) void openCodex(); },
+    tools: {
+      openCodex: {
+        name: "openCodex",
+        title: "Open Divine Codex",
+        icon: "fa-solid fa-sun",
+        order: 0,
+        button: true,
+        visible: true,
+        onChange: () => { void openCodex(); }
+      }
+    }
+  };
+});
 
 Hooks.once("init", () => {
   game.settings.registerMenu(MODULE, "openCodex", {
