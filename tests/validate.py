@@ -62,9 +62,32 @@ assert not re.search(r"[\u0400-\u04FF]", js), "Module code/messages must be Engl
 assert not re.search(r"[\u0400-\u04FF]", src), "All bundled deity text must be English."
 assert (ROOT / "data" / "legacy.js").is_file(), "Original v0.1.1 seeds are required for safe migration."
 assert 'getSceneControlButtons' in js and 'controls.gods' in js, "Scene Controls launcher must be registered."
-assert 'migrateLegacyRecords' in js and 'DATABASE_SCHEMA = 2' in js, "Existing user data must be migrated, not overwritten."
-assert 'DEFAULT_IMPORTANCE' in js and 'importanceBand' in js
-assert 'Number(b.importance) - Number(a.importance)' in js
-assert 'numeric: field[0] === "importance"' in js and 'name="{{key}}"' in template
-assert 'importanceBand' in template
+assert 'migrateLegacyRecords' in js and 'DATABASE_SCHEMA = 3' in js, "Safe schema migration required."
+assert 'POWER_BY_ID' in js and 'this.entries.sort(comparePower)' in js
+assert 'divineTier' in template and 'tierHeader' in template
+assert 'tierOptions' in js and 'Position in Tier' in js
+# Preserve the exact number and original within-tier sequence from the Obsidian note.
+ranks = (ROOT / "data" / "power-hierarchy.js").read_text(encoding="utf-8")
+ranks_match = re.search(r'export const POWER_HIERARCHY = (\\{.*\\});\\s*$', ranks, re.DOTALL)
+assert ranks_match
+hierarchy = json.loads(ranks_match.group(1))
+assert [tier["tier"] for tier in hierarchy["tiers"]] == [
+    "Primordial Powers", "Greater Gods", "Major Gods", "Lesser Gods"
+]
+expected = [
+    ["izanagi", "izanami"],
+    ["amaterasu", "ra", "odin", "mystra", "bahamut", "tiamat", "shar", "astrael"],
+    ["selune", "tsukuyomi", "susanoo", "poseidon", "kelemvor", "hades", "thor", "athena", "raven-queen", "tenrai-no-kami", "asmodeus"],
+    ["fujin", "inari", "raijin", "hikari", "ragamodji", "shizuru", "kirinokami", "akurojin-no-hi", "bastet", "hermes"],
+]
+assert [tier["deities"] for tier in hierarchy["tiers"]] == expected
+additions = (ROOT / "data" / "obsidian-deities.js").read_text(encoding="utf-8")
+extras_match = re.search(r'export const OBSIDIAN_DEITIES = (\\[.*\\]);\\s*$', additions, re.DOTALL)
+assert extras_match
+extra_data = json.loads(extras_match.group(1))
+assert len(extra_data) == 19
+all_ids = {god["id"] for god in deities} | {god["id"] for god in extra_data}
+assert len(all_ids) == 53
+assert set(sum(expected, [])) <= all_ids, "Every power-ranked god must be present."
+assert not re.search(r"[\\u0400-\\u04FF]", additions), "New entries must be in English."
 print("OK: manifest, %d deity portraits, GM access controls, UI actions." % len(deities))
