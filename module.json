@@ -1,7 +1,7 @@
 {
   "id": "gods",
   "title": "Gods — Divine Codex",
-  "description": "GM-only deity encyclopedia for Foundry V14 / D&D5e 5.3.3; obeys Averis Obsidian divine power hierarchy with 4 tiers, private notes and portrait sharing.",
+  "description": "GM-only Foundry V14 + D&D5e 5.3.3 divine encyclopedia. 53 profiles, including 31 gods ordered by the exact Averis Obsidian power hierarchy; private notes and shareable portraits.",
   "version": "0.2.4",
   "authors": [
     {
