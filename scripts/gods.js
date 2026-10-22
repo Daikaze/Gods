@@ -1,6 +1,9 @@
 import { SEED_DEITIES } from "../data/deities.js";
 
 const MODULE = "gods";
+const SUPPORTED_FOUNDRY_GENERATION = 14;
+const SUPPORTED_SYSTEM_ID = "dnd5e";
+const SUPPORTED_SYSTEM_VERSION = "5.3.3";
 const DB_NAME = "Gods — GM Database (private)";
 const IMAGE_FALLBACK = "modules/gods/assets/deities/unknown.svg";
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -43,6 +46,29 @@ const DETAIL_GROUPS = EDIT_GROUPS.slice(1, -1);
 const text = value => String(value ?? "").trim();
 const normalize = value => text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
 const hasAccess = () => Boolean(game.user?.isGM);
+
+/**
+ * Supported deployment: Foundry VTT generation 14 with D&D 5e system 5.3.3.
+ * Other system versions may have different behavior and are intentionally blocked.
+ */
+function compatibility() {
+  const generation = Number(game.release?.generation ?? String(game.version ?? "").split(".")[0]);
+  const system = game.system?.id ?? "";
+  const version = game.system?.version ?? "";
+  return {
+    generation, system, version,
+    supported: generation === SUPPORTED_FOUNDRY_GENERATION
+      && system === SUPPORTED_SYSTEM_ID
+      && version === SUPPORTED_SYSTEM_VERSION
+  };
+}
+const isSupported = () => compatibility().supported;
+const unsupportedMessage = () => {
+  const { generation, system, version } = compatibility();
+  return "Gods изисква Foundry V14 + D&D5e 5.3.3. Текущо: Foundry "
+    + (Number.isFinite(generation) ? "V" + generation : "неизвестна версия")
+    + ", " + (system || "неизвестна система") + " " + (version || "неизвестна версия") + ".";
+};
 const newId = () => "deity-" + foundry.utils.randomID(16);
 
 function cleanRecord(record = {}) {
@@ -63,6 +89,7 @@ function database() {
 
 async function ensureDatabase() {
   if (!hasAccess()) throw new Error("Gods е достъпен само за GM.");
+  if (!isSupported()) throw new Error(unsupportedMessage());
   const existing = database();
   if (existing) return existing;
   return JournalEntry.create({
@@ -104,7 +131,8 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   _canRender(options) {
-    return hasAccess() && super._canRender(options);
+    if (!hasAccess() || !isSupported()) return false;
+    return super._canRender(options);
   }
 
   async _prepareContext(options) {
@@ -350,6 +378,10 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 let codex = null;
 async function openCodex() {
   if (!hasAccess()) return;
+  if (!isSupported()) {
+    ui.notifications.warn(unsupportedMessage());
+    return;
+  }
   try {
     await ensureDatabase();
     if (!codex || !codex.rendered) codex = new GodsCodex();
@@ -373,6 +405,10 @@ Hooks.once("init", () => {
 });
 Hooks.once("ready", () => {
   if (!hasAccess()) return;
-  game.gods = Object.freeze({ open: openCodex });
-  console.info("Gods | Divine Codex ready for GM");
+  game.gods = Object.freeze({ open: openCodex, compatibility });
+  if (!isSupported()) {
+    ui.notifications.warn(unsupportedMessage());
+    return;
+  }
+  console.info("Gods | Foundry V14 + D&D5e 5.3.3 ready for GM");
 });

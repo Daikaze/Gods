@@ -9,6 +9,13 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
 assert manifest["compatibility"]["minimum"] == "14"
+assert manifest["compatibility"]["maximum"] == "14"
+assert manifest["version"] == "0.1.1"
+systems = manifest["relationships"]["systems"]
+assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
+assert systems[0]["type"] == "system"
+assert systems[0]["compatibility"]["minimum"] == "5.3.3"
+assert systems[0]["compatibility"]["maximum"] == "5.3.3"
 assert manifest["version"]
 for key in ("esmodules", "styles"):
     for path in manifest[key]:
@@ -35,6 +42,9 @@ assert sum(g["pantheon"] == "Averis" for g in deities) >= 6
 ET.parse(ROOT / "assets" / "deities" / "unknown.svg")
 js = (ROOT / "scripts" / "gods.js").read_text(encoding="utf-8")
 assert 'restricted: true' in js, "Menu must be GM-only."
+assert 'SUPPORTED_SYSTEM_VERSION = "5.3.3"' in js
+assert 'SUPPORTED_FOUNDRY_GENERATION = 14' in js
+assert 'isSupported()' in js, "Operations must check system/core versions"
 assert 'hasAccess()' in js, "All mutations must be GM-gated."
 assert 'ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.NONE }' in js, "Journal must be private."
 template = (ROOT / "templates" / "codex.hbs").read_text(encoding="utf-8")

@@ -1,15 +1,16 @@
 {
   "id": "gods",
   "title": "Gods — Divine Codex",
-  "description": "GM-only searchable deity encyclopedia for Foundry VTT V14, with illustrated deity profiles and editable campaign lore.",
-  "version": "0.1.0",
+  "description": "GM-only divine encyclopedia for Foundry VTT V14 with D&D 5e system v5.3.3: illustrated searchable deity profiles and private campaign lore.",
+  "version": "0.1.1",
   "authors": [
     {
       "name": "Daikaze"
     }
   ],
   "compatibility": {
-    "minimum": "14"
+    "minimum": "14",
+    "maximum": "14"
   },
   "esmodules": [
     "scripts/gods.js"
@@ -19,5 +20,17 @@
   ],
   "url": "https://github.com/Daikaze/Gods",
   "manifest": "https://raw.githubusercontent.com/Daikaze/Gods/main/module.json",
-  "download": "https://github.com/Daikaze/Gods/archive/refs/heads/main.zip"
+  "download": "https://github.com/Daikaze/Gods/archive/refs/heads/main.zip",
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "5.3.3",
+          "maximum": "5.3.3"
+        }
+      }
+    ]
+  }
 }

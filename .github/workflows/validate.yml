@@ -20,3 +20,5 @@ jobs:
           node --check data/deities.js
       - name: Validate manifest, portraits and deity data
         run: python3 tests/validate.py
+      - name: Mocked Foundry V14 and D&D5e 5.3.3 runtime tests
+        run: node tests/compatibility.mjs
