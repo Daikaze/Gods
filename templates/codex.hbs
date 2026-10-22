@@ -18,9 +18,12 @@
     <div class="gods-list-meta"><span>DEITIES</span><span data-role="result-count">{{total}} / {{total}}</span></div>
     <div class="gods-list">
       {{#each entries}}
+        {{#if tierHeader}}
+          <div class="gods-tier-heading" data-tier="{{divineTier}}">{{divineTier}}</div>
+        {{/if}}
         <button type="button" class="gods-entry {{#if active}}is-active{{/if}}" data-action="selectGod" data-id="{{id}}">
           <img class="gods-portrait gods-entry-art" src="{{image}}" alt="" loading="lazy">
-          <span class="gods-entry-copy"><strong>{{name}}</strong><small>{{title}}</small><em>{{importanceBand}} · {{importance}}/100</em></span>
+          <span class="gods-entry-copy"><strong>{{name}}</strong><small>{{title}}</small><em>{{divineTier}}</em></span>
           <i class="fa-solid fa-chevron-right"></i>
         </button>
       {{/each}}
@@ -41,7 +44,7 @@
         <button type="button" data-action="cancelEdit" class="gods-outline"><i class="fa-solid fa-xmark"></i> Cancel</button>
       </div>
       <form data-gods-editor class="gods-editor">
-        <p class="gods-priority-help">Campaign Importance controls display order, not divine power. Higher numbers appear first (0–100).</p>
+        <p class="gods-priority-help">Sort by the Obsidian divine power hierarchy: Primordial, Greater, Major, Lesser. A deity's position within its tier follows the Obsidian list. Unranked gods stay below all four tiers. Story Importance is retained only for compatibility.</p>
         <div class="gods-image-editor">
           <img class="gods-portrait" data-role="image-preview" src="{{image}}" alt="Portrait">
           <label><strong>Deity Portrait</strong><small>Choose a Foundry image or enter a file path / URL.</small>
@@ -54,7 +57,11 @@
             {{#each fields}}
               <label class="{{#if multiline}}gods-full-span{{/if}}"><span>{{label}}</span>
                 {{#if multiline}}<textarea name="{{key}}" rows="3">{{value}}</textarea>
-                {{else}}{{#if numeric}}<input type="number" min="0" max="100" step="1" required name="{{key}}" value="{{value}}">{{else}}<input type="text" name="{{key}}" value="{{value}}">{{/if}}{{/if}}
+                {{else}}{{#if tierSelect}}<select name="{{key}}" required>
+                    {{#each tierOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+                  </select>
+                  {{else}}{{#if numeric}}<input type="number" min="0" max="999" step="1" name="{{key}}" value="{{value}}">
+                  {{else}}<input type="text" name="{{key}}" value="{{value}}">{{/if}}{{/if}}{{/if}}
               </label>
             {{/each}}
           </div></section>
@@ -78,6 +85,7 @@
               <h1>{{selected.name}}</h1>
               {{#if selected.title}}<p class="gods-hero-title">{{selected.title}}</p>{{/if}}
               {{#if selected.aliases}}<p class="gods-aliases">{{selected.aliases}}</p>{{/if}}
+              <div class="gods-power-label"><i class="fa-solid fa-crown"></i> {{selected.divineTier}}</div>
               <div class="gods-tags">
                 {{#if selected.domains}}<span><i class="fa-solid fa-sparkles"></i> {{selected.domains}}</span>{{/if}}
                 {{#if selected.alignment}}<span>{{selected.alignment}}</span>{{/if}}

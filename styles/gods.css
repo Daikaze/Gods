@@ -44,6 +44,9 @@
 .gods-entry-copy strong { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:14px; }
 .gods-entry-copy small { color:#b8bfca; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
 .gods-entry-copy em { color:#c19c6b; font-size:10px; font-style:normal; }
+.gods-tier-heading { margin:12px 7px 5px; padding:7px 9px; color:#e2bb7e; font-weight:700; letter-spacing:.7px; font-size:11px; text-transform:uppercase; border-bottom:1px solid rgba(215,170,100,.2); }
+.gods-tier-heading[hidden] { display:none; }
+.gods-power-label { display:inline-flex; gap:6px; align-items:center; padding:5px 8px; border:1px solid rgba(215,170,100,.38); border-radius:6px; font-size:11px; color:#f0d6ac; background:#31313a; margin-top:12px; }
 .gods-priority-help { margin:0; font-size:12px; line-height:1.5; color:#cfc0a9; }
 .gods-entry > i { color:#9b825d; font-size:10px; }
 .gods-empty-list { padding:25px 10px; text-align:center; color:var(--gods-muted); }
@@ -104,7 +107,7 @@
 .gods-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
 .gods-form-grid label { display:grid; align-content:start; gap:5px; color:#ded7cb; font-size:12px; }
 .gods-form-grid .gods-full-span { grid-column:1/-1; }
-.gods-editor input,.gods-editor textarea { width:100%; color:#f6f0e6; background:#10161f; border:1px solid #525462; border-radius:5px; padding:8px; outline:0; box-shadow:none; }
+ .gods-editor input,.gods-editor textarea,.gods-editor select { width:100%; color:#f6f0e6; background:#10161f; border:1px solid #525462; border-radius:5px; padding:8px; outline:0; box-shadow:none; }
 .gods-editor textarea { resize:vertical; min-height:75px; }
 .gods-editor input:focus,.gods-editor textarea:focus { border-color:var(--gods-gold); }
 .gods-editor-actions { display:flex; justify-content:flex-end; gap:10px; padding:8px 0 20px; }

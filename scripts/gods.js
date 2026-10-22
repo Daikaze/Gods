@@ -1,5 +1,7 @@
 import { SEED_DEITIES } from "../data/deities.js";
 import { LEGACY_DEITIES } from "../data/legacy.js";
+import { POWER_HIERARCHY } from "../data/power-hierarchy.js";
+import { OBSIDIAN_DEITIES } from "../data/obsidian-deities.js";
 
 const MODULE = "gods";
 const SUPPORTED_FOUNDRY_GENERATION = 14;
@@ -7,8 +9,11 @@ const SUPPORTED_SYSTEM_ID = "dnd5e";
 const SUPPORTED_SYSTEM_VERSION = "5.3.3";
 const DB_NAME = "Gods — GM Database (private)";
 const IMAGE_FALLBACK = "modules/gods/assets/deities/unknown.svg";
-// Importance measures story relevance in Averis, not raw divine power.
-// GM-saved rankings take precedence over these defaults.
+// Power tiers are authoritative to the Obsidian campaign note, not story importance.
+const POWER_TIERS = [...POWER_HIERARCHY.tiers.map(group => group.tier), POWER_HIERARCHY.unranked];
+const POWER_BY_ID = new Map(POWER_HIERARCHY.tiers.flatMap(group =>
+  group.deities.map((id, i) => [id, { tier: group.tier, order: i + 1 }])
+));
 const DEFAULT_IMPORTANCE = Object.freeze({
   ragamodji: 100, asmodeus: 98, fujin: 96, izanami: 94,
   hikari: 92, selune: 90, "raven-queen": 88,
@@ -22,12 +27,11 @@ const DEFAULT_IMPORTANCE = Object.freeze({
   waukeen: 40, eldath: 39
 });
 const defaultImportance = id => DEFAULT_IMPORTANCE[id] ?? 50;
-const importanceBand = score => {
-  if (Number(score) >= 90) return "Main Story";
-  if (Number(score) >= 75) return "Character Connection";
-  if (Number(score) >= 45) return "Supporting Lore";
-  return "Background";
-};
+const comparePower = (a, b) =>
+  POWER_TIERS.indexOf(a.divineTier) - POWER_TIERS.indexOf(b.divineTier)
+  || Number(a.tierPosition) - Number(b.tierPosition)
+  || a.name.localeCompare(b.name, "en");
+
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
 const EDIT_GROUPS = [
@@ -37,7 +41,10 @@ const EDIT_GROUPS = [
     ["category", "Divine Rank / Type", false], ["alignment", "Alignment", false],
     ["domains", "Domains and Spheres of Influence", false],
     ["symbol", "Holy Symbol", false], ["plane", "Divine Realm / Plane", false],
-    ["importance", "Campaign Importance (0-100, higher = earlier)", false],
+    ["divineTier", "Divine Power Tier", false],
+    ["tierPosition", "Position in Tier (Obsidian order)", false],
+    ["contactDC", "Divine Contact DC (optional)", false],
+    ["importance", "Story Importance (legacy; does not affect ordering)", false],
     ["summary", "Overview", true]
   ]},
   { title: "Myths and Divine Nature", fields: [
@@ -69,7 +76,7 @@ const DETAIL_GROUPS = EDIT_GROUPS.slice(1, -1);
 const text = value => String(value ?? "").trim();
 const normalize = value => text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
 const hasAccess = () => Boolean(game.user?.isGM);
-const DATABASE_SCHEMA = 2;
+const DATABASE_SCHEMA = 3;
 
 /** Migrate only fields identical to the original starter pack, preserving all GM edits. */
 function migrateLegacyRecords(records) {
@@ -117,6 +124,11 @@ const newId = () => "deity-" + foundry.utils.randomID(16);
 function cleanRecord(record = {}) {
   const cleaned = { id: text(record.id) || newId(), image: text(record.image) || IMAGE_FALLBACK };
   for (const key of KEYS) cleaned[key] = text(record[key]);
+  const sourceRank = POWER_BY_ID.get(cleaned.id);
+  cleaned.divineTier = POWER_TIERS.includes(cleaned.divineTier)
+    ? cleaned.divineTier : (sourceRank?.tier || POWER_HIERARCHY.unranked);
+  cleaned.tierPosition = /^(?:[1-9]\d{0,2})$/.test(cleaned.tierPosition)
+    ? cleaned.tierPosition : String(sourceRank?.order ?? 999);
   const rank = text(record.importance);
   cleaned.importance = /^(?:100|[1-9]?\d)$/.test(rank)
     ? rank : String(defaultImportance(cleaned.id));
@@ -124,7 +136,7 @@ function cleanRecord(record = {}) {
 }
 
 function seedRecords() {
-  return SEED_DEITIES.map(entry => cleanRecord({
+  return [...SEED_DEITIES, ...OBSIDIAN_DEITIES].map(entry => cleanRecord({
     ...entry, image: entry.image || "modules/gods/assets/deities/" + entry.id + ".svg"
   }));
 }
@@ -140,9 +152,20 @@ async function ensureDatabase() {
   if (existing) {
     const schema = Number(existing.getFlag(MODULE, "schema") || 1);
     if (schema < DATABASE_SCHEMA) {
-      const records = existing.getFlag(MODULE, "records") || [];
+      let records = existing.getFlag(MODULE, "records") || [];
+      if (schema < 2) records = migrateLegacyRecords(records);
+      if (schema < 3) {
+        const ids = new Set(records.map(entry => entry.id));
+        // Add only the 19 newly catalogued gods, preserving deletions and all older GM edits.
+        for (const entry of OBSIDIAN_DEITIES) {
+          if (!ids.has(entry.id)) {
+            records.push(seedRecords().find(seed => seed.id === entry.id));
+            ids.add(entry.id);
+          }
+        }
+      }
       await existing.update({
-        ["flags." + MODULE + ".records"]: migrateLegacyRecords(records),
+        ["flags." + MODULE + ".records"]: records,
         ["flags." + MODULE + ".schema"]: DATABASE_SCHEMA
       });
       console.info("Gods | Database upgraded to schema " + DATABASE_SCHEMA + " (GM changes preserved)");
@@ -233,10 +256,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
     const db = await ensureDatabase();
     this.entries = (db.getFlag(MODULE, "records") || []).map(cleanRecord);
-    this.entries.sort((a, b) =>
-      Number(b.importance) - Number(a.importance)
-      || a.name.localeCompare(b.name, "en")
-    );
+    this.entries.sort(comparePower);
     if (!this.selectedId || !this.entries.some(entry => entry.id === this.selectedId)) {
       this.selectedId = this.entries[0]?.id ?? null;
     }
@@ -259,13 +279,19 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       title: group.title,
       fields: group.fields.map(field => ({
         key: field[0], label: field[1], multiline: field[2],
-        numeric: field[0] === "importance",
+        numeric: field[0] === "importance" || field[0] === "tierPosition" || field[0] === "contactDC",
+        tierSelect: field[0] === "divineTier",
+        tierOptions: field[0] === "divineTier"
+          ? POWER_TIERS.map(tier => ({ value: tier, label: tier, selected: tier === edited.divineTier }))
+          : [],
         value: edited[field[0]] || ""
       }))
     }));
     return {
-      ...context, editing: this.editing, entries: this.entries.map(entry => ({
-        ...entry, importanceBand: importanceBand(entry.importance), active: entry.id === this.selectedId
+      ...context, editing: this.editing, entries: this.entries.map((entry, index) => ({
+        ...entry,
+        tierHeader: index === 0 || this.entries[index - 1].divineTier !== entry.divineTier,
+        active: entry.id === this.selectedId
       })), selected: display, groups, editGroups,
       image: edited.image, search: this.search, pantheon: this.pantheon,
       pantheons: [...new Set(this.entries.map(entry => entry.pantheon).filter(Boolean))].sort(),
@@ -311,6 +337,11 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     }
     const counter = this.element.querySelector("[data-role='result-count']");
     if (counter) counter.textContent = count + " / " + this.entries.length;
+    for (const heading of this.element.querySelectorAll(".gods-tier-heading")) {
+      const tier = heading.dataset.tier;
+      heading.hidden = ![...this.element.querySelectorAll("[data-action='selectGod']")]
+        .some(button => !button.hidden && this.entries.some(entry => entry.id === button.dataset.id && entry.divineTier === tier));
+    }
     const empty = this.element.querySelector("[data-role='empty-results']");
     if (empty) empty.hidden = count > 0;
   }
@@ -391,6 +422,15 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!/^(?:100|[1-9]?\d)$/.test(text(values.importance))) {
       ui.notifications.warn("Campaign Importance must be a whole number from 0 to 100.");
       form.querySelector('[name="importance"]')?.focus();
+      return;
+    }
+    if (!POWER_TIERS.includes(text(values.divineTier))) {
+      ui.notifications.warn("Select a valid Divine Power Tier.");
+      return;
+    }
+    if (!/^[1-9]\d{0,2}$/.test(text(values.tierPosition))) {
+      ui.notifications.warn("Position in Tier must be a whole number from 1 to 999.");
+      form.querySelector('[name="tierPosition"]')?.focus();
       return;
     }
     const updated = cleanRecord({ ...values, id: this.draft.id });

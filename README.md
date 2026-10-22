@@ -8,7 +8,7 @@ Searchable, illustrated deity library built for Daikaze's Averis campaign, with 
 
 - **Foundry core:** Version **14** (any stable V14 build).
 - **Game system:** `dnd5e` **exactly 5.3.3**. This is the D&D 5e game system version, **not** the Foundry build number.
-- Version 0.2.3 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
+- Version 0.2.4 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
 - No new D&D6-only APIs are used; the UI relies on V14 `ApplicationV2` and the standard `JournalEntry` API.
 - Existing Gods records are preserved: updates do **not** replace the GM-private Journal or its edited deity entries.
 
@@ -18,9 +18,18 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.3/gods-v0.2.3.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.4/gods-v0.2.4.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
+
+## New in v0.2.4
+
+- **Obsidian-exact divine power hierarchy:** Primordial Powers → Greater Gods → Major Gods → Lesser Gods, preserving the written order within each tier. This is not the old story-importance ranking.
+- **The 31 ranked gods** from the Averis Obsidian note appear in their original groups; **19 missing ranked gods** were added to the catalog with English starter profiles based on the note.
+- **22 other existing gods** remain in a separate **Unranked** section, rather than being assigned unsupported power tiers.
+- **GM-editable tier and tier position** in each deity's profile. Legacy Story Importance is retained but no longer determines list order. Search, filters, portrait sharing and scroll position continue working.
+- **One-time schema 3 upgrade:** adds missing Obsidian gods without overwriting or recreating existing GM-edited records, deleted legacy entries, private notes or image selections. New entries use the existing fallback portrait pending custom art.
+- The term **Power Tier** refers to the Obsidian document's cosmic-influence groups. Gods in the same tier are displayed in the file's order; this need not imply a numerical strength difference.
 
 ## New in v0.2.3
 
