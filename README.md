@@ -18,9 +18,16 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.0 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.0/gods-v0.2.0.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.1/gods-v0.2.1.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
+
+## Fixed in v0.2.1
+
+- **Deity list scroll stays in place:** selecting a deity no longer jumps the scrollable left list back to its first entry.
+- **Search and pantheon filters stay active** when navigating between gods.
+- The newly selected deity's right-hand profile starts at the top, while ordinary rerenders also preserve each column's last scroll position.
+- Regression checks verify selecting a deity after scrolling and reopening the codex. No GM notes or deity records are changed.
 
 ## New in v0.2.0
 
@@ -30,7 +37,7 @@ Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → 
 - **Safe upgrade from v0.1.1:** a one-time migration translates and expands only unchanged original starter text. GM edits, custom deities, imported entries and portrait choices remain. Back up before major upgrades as usual.
 - **GM-only reminder:** this repository is public, and its *starter source lore* may be viewed by anyone visiting GitHub. Keep unrevealed plot secrets in the application's private GM notes, not in public source files.
 
-## Included features (v0.2.0)
+## Included features (v0.2.1)
 
 - **GM-only access.** The UI is not created for players; all operations reject non-GMs. Data is stored in a GM-private JournalEntry with default ownership **NONE**, not in readable world settings. Do **not** manually grant player access to the "Gods — GM Database (private)" Journal.
 - **Search as you type** across titles, aliases, domains, symbols, lore and notes. Filter by pantheon/world.
@@ -40,7 +47,7 @@ Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → 
 - JSON **Backup / Import**. Import merges by ID (matching IDs are overwritten); all files include secret notes — keep backups private.
 - Optional sample profiles are labeled "Forgotten Realms" and don't rewrite the campaign.
 
-**Data lifecycle:** The library is seeded *once*, when a GM opens the module for the first time. On v0.2.0 upgrade, the database migrates once: only unchanged original seed text is updated to English and enriched lore. GM-authored edits are preserved. Later updates do not overwrite GM edits. The secret fields are not embedded in public source files.
+**Data lifecycle:** The library is seeded *once*, when a GM opens the module for the first time. On v0.2.1 upgrade, the database migrates once: only unchanged original seed text is updated to English and enriched lore. GM-authored edits are preserved. Later updates do not overwrite GM edits. The secret fields are not embedded in public source files.
 
 ## Caveats
 
