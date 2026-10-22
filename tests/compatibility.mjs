@@ -2,6 +2,9 @@
 // This is not a replacement for manually testing in a live Foundry world.
 import assert from "node:assert/strict";
 
+const imageEvents = [];
+const sentChatMessages = [];
+let dialogChoice = null;
 const callbacks = {};
 const events = {};
 globalThis.Hooks = {
@@ -10,6 +13,10 @@ globalThis.Hooks = {
 };
 
 const notices = { warnings: [], errors: [] };
+globalThis.ChatMessage = {
+  getSpeaker: ({ alias }) => ({ alias }),
+  async create(data) { sentChatMessages.push(data); return data; }
+};
 globalThis.ui = { notifications: {
   warn(message) { notices.warnings.push(message); },
   error(message) { notices.errors.push(message); },
@@ -26,16 +33,25 @@ class FakeApplicationV2 {
   bringToFront() {}
 }
 
+class MockImagePopout {
+  constructor(options) { imageEvents.push({ type: "popout", options }); }
+  async render(force) { imageEvents.push({ type: "render", force }); return this; }
+  shareImage() { imageEvents.push({ type: "share" }); }
+}
 globalThis.foundry = {
   utils: {
     randomID: () => "test-random-id",
     escapeHTML: text => text
   },
   applications: {
+    apps: { ImagePopout: MockImagePopout },
     api: {
       ApplicationV2: FakeApplicationV2,
       HandlebarsApplicationMixin: base => base,
-      DialogV2: { async confirm() { return true; } }
+      DialogV2: {
+        async confirm() { return true; },
+        async wait(config) { imageEvents.push({ type: "dialog", config }); return dialogChoice; }
+      }
     }
   }
 };
@@ -44,7 +60,7 @@ globalThis.game = {
   release: { generation: 14 },
   version: "14.367",
   system: { id: "dnd5e", version: "5.3.3" },
-  user: { isGM: true },
+  user: { isGM: true, id: "test-gm" },
   settings: {
     registerMenu(namespace, key, data) { menus.set(namespace + "." + key, data); }
   },
@@ -168,6 +184,38 @@ await nav.selectGod("fujin");
 assert.equal(nav.rendered, priorRenderFlag);
 
 assert.notEqual(new MenuApp()._canRender({}), false, "GM on correct version can render");
+
+// Clicking a deity portrait opens a GM action chooser.
+const picture = new MenuApp();
+picture.entries = [
+  { id: "example", name: 'Example <Deity>', image: "modules/gods/assets/deities/selune.svg", secrets: "NEVER-SHARE-GM-SECRET" }
+];
+picture.selectedId = "example";
+dialogChoice = "open";
+await picture.deityImageAction();
+assert.equal(imageEvents.at(-2).type, "popout");
+assert.equal(imageEvents.at(-2).options.src, picture.entries[0].image);
+assert.equal(imageEvents.at(-2).options.window.title, "Example <Deity>");
+assert.equal(imageEvents.at(-1).type, "render");
+assert.equal(imageEvents.some(e => e.type === "share"), false, "Preview must not broadcast");
+
+dialogChoice = "chat";
+await picture.deityImageAction();
+assert.equal(sentChatMessages.length, 1);
+assert.deepEqual(sentChatMessages[0].whisper, [], "Public chat message");
+assert.equal(sentChatMessages[0].speaker.alias, "Divine Codex");
+assert.match(sentChatMessages[0].content, /<img/);
+assert.match(sentChatMessages[0].content, /Example &lt;Deity&gt;/);
+assert.doesNotMatch(sentChatMessages[0].content, /NEVER-SHARE-GM-SECRET/);
+
+dialogChoice = "players";
+await picture.deityImageAction();
+assert.equal(imageEvents.at(-1).type, "share", "Native Foundry V14 shareImage called");
+dialogChoice = "cancel";
+const beforeCancel = imageEvents.length;
+await picture.deityImageAction();
+assert.equal(imageEvents.length, beforeCancel + 1, "Cancel only shows chooser");
+assert.equal(imageEvents.at(-1).type, "dialog");
 
 game.system.version = "6.0.0";
 assert.equal(game.gods.compatibility().supported, false);
