@@ -10,8 +10,8 @@ manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
 assert manifest["compatibility"]["minimum"] == "14"
 assert manifest["compatibility"]["maximum"] == "14"
-assert manifest["version"] == "0.2.1"
-assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.1/gods-v0.2.1.zip"
+assert manifest["version"] == "0.2.2"
+assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.2/gods-v0.2.2.zip"
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
@@ -52,6 +52,11 @@ template = (ROOT / "templates" / "codex.hbs").read_text(encoding="utf-8")
 for action in ("selectGod", "addGod", "deleteGod", "importGods", "exportGods"):
     assert 'data-action="' + action + '"' in template
 assert "data-gods-editor" in template and 'type="submit"' in template
+assert 'data-action="deityImageAction"' in template, "Deity art must be clickable."
+assert 'deityImageAction: function' in js
+assert 'ChatMessage.create' in js and 'popout.shareImage()' in js
+css = (ROOT / "styles" / "gods.css").read_text(encoding="utf-8")
+assert "color-scheme:dark" in css and "select option" in css, "Readable dropdown options required."
 assert not re.search(r"[\u0400-\u04FF]", template), "UI must be fully English."
 assert not re.search(r"[\u0400-\u04FF]", js), "Module code/messages must be English."
 assert not re.search(r"[\u0400-\u04FF]", src), "All bundled deity text must be English."
