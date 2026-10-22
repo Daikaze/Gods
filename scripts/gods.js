@@ -7,6 +7,27 @@ const SUPPORTED_SYSTEM_ID = "dnd5e";
 const SUPPORTED_SYSTEM_VERSION = "5.3.3";
 const DB_NAME = "Gods — GM Database (private)";
 const IMAGE_FALLBACK = "modules/gods/assets/deities/unknown.svg";
+// Importance measures story relevance in Averis, not raw divine power.
+// GM-saved rankings take precedence over these defaults.
+const DEFAULT_IMPORTANCE = Object.freeze({
+  ragamodji: 100, asmodeus: 98, fujin: 96, izanami: 94,
+  hikari: 92, selune: 90, "raven-queen": 88,
+  mystra: 72, shar: 70, bahamut: 69, tiamat: 68,
+  tempus: 67, kelemvor: 66, bane: 65, helm: 64,
+  tyr: 63, torm: 62, lathander: 61, jergal: 60,
+  lolth: 59, corellon: 58, myrkul: 57, bhaal: 56,
+  chauntea: 55, silvanus: 54, moradin: 53,
+  oghma: 52, ilmater: 51, mask: 50,
+  umberlee: 43, talos: 42, sune: 41,
+  waukeen: 40, eldath: 39
+});
+const defaultImportance = id => DEFAULT_IMPORTANCE[id] ?? 50;
+const importanceBand = score => {
+  if (Number(score) >= 90) return "Main Story";
+  if (Number(score) >= 75) return "Character Connection";
+  if (Number(score) >= 45) return "Supporting Lore";
+  return "Background";
+};
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 
 const EDIT_GROUPS = [
@@ -16,6 +37,7 @@ const EDIT_GROUPS = [
     ["category", "Divine Rank / Type", false], ["alignment", "Alignment", false],
     ["domains", "Domains and Spheres of Influence", false],
     ["symbol", "Holy Symbol", false], ["plane", "Divine Realm / Plane", false],
+    ["importance", "Campaign Importance (0-100, higher = earlier)", false],
     ["summary", "Overview", true]
   ]},
   { title: "Myths and Divine Nature", fields: [
@@ -95,6 +117,9 @@ const newId = () => "deity-" + foundry.utils.randomID(16);
 function cleanRecord(record = {}) {
   const cleaned = { id: text(record.id) || newId(), image: text(record.image) || IMAGE_FALLBACK };
   for (const key of KEYS) cleaned[key] = text(record[key]);
+  const rank = text(record.importance);
+  cleaned.importance = /^(?:100|[1-9]?\d)$/.test(rank)
+    ? rank : String(defaultImportance(cleaned.id));
   return cleaned;
 }
 
@@ -208,12 +233,10 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
     const db = await ensureDatabase();
     this.entries = (db.getFlag(MODULE, "records") || []).map(cleanRecord);
-    this.entries.sort((a, b) => {
-      const aCampaign = a.pantheon === "Averis";
-      const bCampaign = b.pantheon === "Averis";
-      if (aCampaign !== bCampaign) return aCampaign ? -1 : 1;
-      return a.name.localeCompare(b.name, "en");
-    });
+    this.entries.sort((a, b) =>
+      Number(b.importance) - Number(a.importance)
+      || a.name.localeCompare(b.name, "en")
+    );
     if (!this.selectedId || !this.entries.some(entry => entry.id === this.selectedId)) {
       this.selectedId = this.entries[0]?.id ?? null;
     }
@@ -236,12 +259,13 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       title: group.title,
       fields: group.fields.map(field => ({
         key: field[0], label: field[1], multiline: field[2],
+        numeric: field[0] === "importance",
         value: edited[field[0]] || ""
       }))
     }));
     return {
       ...context, editing: this.editing, entries: this.entries.map(entry => ({
-        ...entry, active: entry.id === this.selectedId
+        ...entry, importanceBand: importanceBand(entry.importance), active: entry.id === this.selectedId
       })), selected: display, groups, editGroups,
       image: edited.image, search: this.search, pantheon: this.pantheon,
       pantheons: [...new Set(this.entries.map(entry => entry.pantheon).filter(Boolean))].sort(),
@@ -364,6 +388,11 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     const form = this.element.querySelector("[data-gods-editor]");
     if (!form) return;
     const values = Object.fromEntries(new FormData(form).entries());
+    if (!/^(?:100|[1-9]?\d)$/.test(text(values.importance))) {
+      ui.notifications.warn("Campaign Importance must be a whole number from 0 to 100.");
+      form.querySelector('[name="importance"]')?.focus();
+      return;
+    }
     const updated = cleanRecord({ ...values, id: this.draft.id });
     if (!updated.name) {
       ui.notifications.warn("Enter a deity name.");

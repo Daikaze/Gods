@@ -1,8 +1,8 @@
 {
   "id": "gods",
   "title": "Gods — Divine Codex",
-  "description": "GM-only deity encyclopedia for Foundry V14 and D&D5e 5.3.3: searchable pantheons, readable filters, shareable portraits and private Averis lore.",
-  "version": "0.2.2",
+  "description": "GM-only Divine Codex for Foundry V14 / D&D5e 5.3.3 with editable Averis story-importance ordering, lore, and image sharing.",
+  "version": "0.2.3",
   "authors": [
     {
       "name": "Daikaze"
@@ -20,7 +20,7 @@
   ],
   "url": "https://github.com/Daikaze/Gods",
   "manifest": "https://raw.githubusercontent.com/Daikaze/Gods/main/module.json",
-  "download": "https://github.com/Daikaze/Gods/releases/download/v0.2.2/gods-v0.2.2.zip",
+  "download": "https://github.com/Daikaze/Gods/releases/download/v0.2.3/gods-v0.2.3.zip",
   "relationships": {
     "systems": [
       {

@@ -44,6 +44,7 @@
 .gods-entry-copy strong { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:14px; }
 .gods-entry-copy small { color:#b8bfca; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
 .gods-entry-copy em { color:#c19c6b; font-size:10px; font-style:normal; }
+.gods-priority-help { margin:0; font-size:12px; line-height:1.5; color:#cfc0a9; }
 .gods-entry > i { color:#9b825d; font-size:10px; }
 .gods-empty-list { padding:25px 10px; text-align:center; color:var(--gods-muted); }
 .gods-sidebar-bottom { border-top:1px solid var(--gods-line); display:flex; gap:6px; flex-direction:column; padding:10px 13px; font-size:10px; letter-spacing:1px; color:var(--gods-gold); }

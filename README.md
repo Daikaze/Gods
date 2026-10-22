@@ -8,7 +8,7 @@ Searchable, illustrated deity library built for Daikaze's Averis campaign, with 
 
 - **Foundry core:** Version **14** (any stable V14 build).
 - **Game system:** `dnd5e` **exactly 5.3.3**. This is the D&D 5e game system version, **not** the Foundry build number.
-- Version 0.2.0 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
+- Version 0.2.3 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
 - No new D&D6-only APIs are used; the UI relies on V14 `ApplicationV2` and the standard `JournalEntry` API.
 - Existing Gods records are preserved: updates do **not** replace the GM-private Journal or its edited deity entries.
 
@@ -18,9 +18,17 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.2/gods-v0.2.2.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.1 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.3/gods-v0.2.3.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
+
+## New in v0.2.3
+
+- **Sorted by Averis story importance** rather than alphabetically or by divine power: Ragamodji (100), Asmodeus (98), Fūjin (96), Izanami (94), Hikari (92), Selûne (90), then The Raven Queen (88). Generic Forgotten Realms reference gods follow.
+- **GM-editable Campaign Importance (0-100)** in the deity editor; higher scores appear first. Ties sort by English names.
+- Importance bands: Main Story (90-100), Character Connection (75-89), Supporting Lore (45-74), Background (0-44).
+- Existing worlds, custom deity entries, hand-written GM notes and previous priorities are not overwritten; a missing priority is assigned a safe default when loaded, and edited ranks are saved with backups.
+- Search, pantheon filtering, image sharing, and scroll-position preservation remain unchanged.
 
 ## New in v0.2.2
 

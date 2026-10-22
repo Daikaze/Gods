@@ -10,8 +10,8 @@ manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
 assert manifest["compatibility"]["minimum"] == "14"
 assert manifest["compatibility"]["maximum"] == "14"
-assert manifest["version"] == "0.2.2"
-assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.2/gods-v0.2.2.zip"
+assert manifest["version"] == "0.2.3"
+assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.3/gods-v0.2.3.zip"
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
@@ -63,4 +63,8 @@ assert not re.search(r"[\u0400-\u04FF]", src), "All bundled deity text must be E
 assert (ROOT / "data" / "legacy.js").is_file(), "Original v0.1.1 seeds are required for safe migration."
 assert 'getSceneControlButtons' in js and 'controls.gods' in js, "Scene Controls launcher must be registered."
 assert 'migrateLegacyRecords' in js and 'DATABASE_SCHEMA = 2' in js, "Existing user data must be migrated, not overwritten."
+assert 'DEFAULT_IMPORTANCE' in js and 'importanceBand' in js
+assert 'Number(b.importance) - Number(a.importance)' in js
+assert 'numeric: field[0] === "importance"' in js and 'name="{{key}}"' in template
+assert 'importanceBand' in template
 print("OK: manifest, %d deity portraits, GM access controls, UI actions." % len(deities))

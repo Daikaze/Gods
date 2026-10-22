@@ -20,7 +20,7 @@
       {{#each entries}}
         <button type="button" class="gods-entry {{#if active}}is-active{{/if}}" data-action="selectGod" data-id="{{id}}">
           <img class="gods-portrait gods-entry-art" src="{{image}}" alt="" loading="lazy">
-          <span class="gods-entry-copy"><strong>{{name}}</strong><small>{{title}}</small><em>{{pantheon}}</em></span>
+          <span class="gods-entry-copy"><strong>{{name}}</strong><small>{{title}}</small><em>{{importanceBand}} · {{importance}}/100</em></span>
           <i class="fa-solid fa-chevron-right"></i>
         </button>
       {{/each}}
@@ -41,6 +41,7 @@
         <button type="button" data-action="cancelEdit" class="gods-outline"><i class="fa-solid fa-xmark"></i> Cancel</button>
       </div>
       <form data-gods-editor class="gods-editor">
+        <p class="gods-priority-help">Campaign Importance controls display order, not divine power. Higher numbers appear first (0–100).</p>
         <div class="gods-image-editor">
           <img class="gods-portrait" data-role="image-preview" src="{{image}}" alt="Portrait">
           <label><strong>Deity Portrait</strong><small>Choose a Foundry image or enter a file path / URL.</small>
@@ -53,7 +54,7 @@
             {{#each fields}}
               <label class="{{#if multiline}}gods-full-span{{/if}}"><span>{{label}}</span>
                 {{#if multiline}}<textarea name="{{key}}" rows="3">{{value}}</textarea>
-                {{else}}<input type="text" name="{{key}}" value="{{value}}">{{/if}}
+                {{else}}{{#if numeric}}<input type="number" min="0" max="100" step="1" required name="{{key}}" value="{{value}}">{{else}}<input type="text" name="{{key}}" value="{{value}}">{{/if}}{{/if}}
               </label>
             {{/each}}
           </div></section>
