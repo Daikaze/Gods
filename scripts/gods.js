@@ -39,7 +39,7 @@ const EDIT_GROUPS = [
   ]}
 ];
 const KEYS = EDIT_GROUPS.flatMap(group => group.fields.map(field => field[0]));
-const DETAIL_GROUPS = EDIT_GROUPS.slice(1);
+const DETAIL_GROUPS = EDIT_GROUPS.slice(1, -1);
 const text = value => String(value ?? "").trim();
 const normalize = value => text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
 const hasAccess = () => Boolean(game.user?.isGM);
@@ -290,7 +290,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     if (!selected) return;
     const confirmed = await DialogV2.confirm({
       window: { title: "Изтриване на божество" },
-      content: "<p>Да изтрия ли <strong>" + foundry.utils.escapeHTML(selected.name) + "</strong>? Това не може да се върне.</p>",
+      content: "<p>Да изтрия ли <strong>" + Handlebars.escapeExpression(selected.name) + "</strong>? Това не може да се върне.</p>",
       rejectClose: false
     });
     if (!confirmed) return;
@@ -361,23 +361,18 @@ async function openCodex() {
   }
 }
 
-function installSettingsButton(html) {
-  if (!hasAccess()) return;
-  const root = html instanceof HTMLElement ? html : html?.[0];
-  if (!root || root.querySelector(".gods-open-button")) return;
-  const target = root.querySelector("#settings-game") || root.querySelector(".settings-sidebar") || root.querySelector(".settings-menu") || root;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "gods-open-button";
-  button.innerHTML = '<i class="fa-solid fa-book-open"></i> Gods — Divine Codex';
-  button.addEventListener("click", () => void openCodex());
-  target.appendChild(button);
-}
-
-Hooks.on("renderSettings", (_app, html) => installSettingsButton(html));
+Hooks.once("init", () => {
+  game.settings.registerMenu(MODULE, "openCodex", {
+    name: "Gods — Divine Codex",
+    label: "Open Divine Codex",
+    hint: "GM-only searchable library of deities and secret campaign lore.",
+    icon: "fa-solid fa-book-open",
+    type: GodsCodex,
+    restricted: true
+  });
+});
 Hooks.once("ready", () => {
   if (!hasAccess()) return;
   game.gods = Object.freeze({ open: openCodex });
-  if (ui.settings?.element) installSettingsButton(ui.settings.element);
   console.info("Gods | Divine Codex ready for GM");
 });
