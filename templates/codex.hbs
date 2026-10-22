@@ -67,7 +67,11 @@
       {{#if selected}}
         <div class="gods-profile">
           <header class="gods-hero">
-            <img class="gods-portrait gods-hero-art" src="{{selected.image}}" alt="{{selected.name}}">
+            <button type="button" class="gods-hero-image-button" data-action="deityImageAction"
+              aria-label="Open image actions for {{selected.name}}" title="Open image actions">
+              <img class="gods-portrait gods-hero-art" src="{{selected.image}}" alt="{{selected.name}}">
+              <span class="gods-hero-image-hint"><i class="fa-solid fa-image"></i> Image Actions</span>
+            </button>
             <div class="gods-hero-content">
               <span class="gods-eyebrow">{{selected.pantheon}} <i class="fa-solid fa-diamond"></i> {{selected.category}}</span>
               <h1>{{selected.name}}</h1>
