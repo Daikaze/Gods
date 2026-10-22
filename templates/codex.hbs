@@ -2,20 +2,20 @@
   <aside class="gods-sidebar">
     <div class="gods-sidebar-title">
       <div><span class="gods-eyebrow">DIVINE ENCYCLOPEDIA</span><h2><i class="fa-solid fa-book-open"></i> Gods</h2></div>
-      <button type="button" data-action="addGod" class="gods-icon-button" title="Добави бог"><i class="fa-solid fa-plus"></i></button>
+      <button type="button" data-action="addGod" class="gods-icon-button" title="Add Deity"><i class="fa-solid fa-plus"></i></button>
     </div>
     <div class="gods-search-wrap">
       <label class="gods-search"><i class="fa-solid fa-magnifying-glass"></i>
-        <input type="search" data-role="search" value="{{search}}" placeholder="Търси бог, символ, домейн, история...">
+        <input type="search" data-role="search" value="{{search}}" placeholder="Search name, symbol, domain, history...">
       </label>
-      <select data-role="pantheon" aria-label="Филтрирай по пантеон">
-        <option value="">Всички пантеони</option>
+      <select data-role="pantheon" aria-label="Filter by pantheon">
+        <option value="">All Pantheons</option>
         {{#each pantheons}}
           <option value="{{this}}" {{#if (eq this ../pantheon)}}selected{{/if}}>{{this}}</option>
         {{/each}}
       </select>
     </div>
-    <div class="gods-list-meta"><span>БОЖЕСТВА</span><span data-role="result-count">{{total}} / {{total}}</span></div>
+    <div class="gods-list-meta"><span>DEITIES</span><span data-role="result-count">{{total}} / {{total}}</span></div>
     <div class="gods-list">
       {{#each entries}}
         <button type="button" class="gods-entry {{#if active}}is-active{{/if}}" data-action="selectGod" data-id="{{id}}">
@@ -24,29 +24,29 @@
           <i class="fa-solid fa-chevron-right"></i>
         </button>
       {{/each}}
-      <div class="gods-empty-list" data-role="empty-results" hidden>Няма намерени богове. Промени търсенето.</div>
+      <div class="gods-empty-list" data-role="empty-results" hidden>No matching deities. Try another search.</div>
     </div>
     <div class="gods-sidebar-bottom">
       <span><i class="fa-solid fa-lock"></i> GM ONLY</span>
       <div>
-        <button type="button" class="gods-text-button" data-action="importGods" title="Импорт от резервно копие"><i class="fa-solid fa-file-import"></i> Import</button>
-        <button type="button" class="gods-text-button" data-action="exportGods" title="Резервно копие с DM тайните"><i class="fa-solid fa-file-export"></i> Backup</button>
+        <button type="button" class="gods-text-button" data-action="importGods" title="Import a backup"><i class="fa-solid fa-file-import"></i> Import</button>
+        <button type="button" class="gods-text-button" data-action="exportGods" title="Backup includes GM secrets"><i class="fa-solid fa-file-export"></i> Backup</button>
       </div>
       <input type="file" accept="application/json,.json" data-role="import-file" hidden>
     </div>
   </aside>
   <main class="gods-main">
     {{#if editing}}
-      <div class="gods-edit-header"><div><span class="gods-eyebrow">GM EDITOR</span><h2>Профил на божество</h2></div>
-        <button type="button" data-action="cancelEdit" class="gods-outline"><i class="fa-solid fa-xmark"></i> Откажи</button>
+      <div class="gods-edit-header"><div><span class="gods-eyebrow">GM EDITOR</span><h2>Deity Profile</h2></div>
+        <button type="button" data-action="cancelEdit" class="gods-outline"><i class="fa-solid fa-xmark"></i> Cancel</button>
       </div>
       <form data-gods-editor class="gods-editor">
         <div class="gods-image-editor">
-          <img class="gods-portrait" data-role="image-preview" src="{{image}}" alt="Изображение">
-          <label><strong>Изображение на божеството</strong><small>Избери файл от Foundry или въведи път / URL.</small>
+          <img class="gods-portrait" data-role="image-preview" src="{{image}}" alt="Portrait">
+          <label><strong>Deity Portrait</strong><small>Choose a Foundry image or enter a file path / URL.</small>
             <input type="text" name="image" value="{{image}}" placeholder="modules/gods/assets/deities/unknown.svg">
           </label>
-          <button type="button" data-action="chooseImage" class="gods-outline"><i class="fa-solid fa-image"></i> Избери</button>
+          <button type="button" data-action="chooseImage" class="gods-outline"><i class="fa-solid fa-image"></i> Browse</button>
         </div>
         {{#each editGroups}}
           <section class="gods-edit-group"><h3>{{title}}</h3><div class="gods-form-grid">
@@ -59,8 +59,8 @@
           </div></section>
         {{/each}}
         <div class="gods-editor-actions">
-          <button type="button" data-action="cancelEdit" class="gods-outline">Откажи</button>
-          <button type="submit" class="gods-primary"><i class="fa-solid fa-floppy-disk"></i> Запази божеството</button>
+          <button type="button" data-action="cancelEdit" class="gods-outline">Cancel</button>
+          <button type="submit" class="gods-primary"><i class="fa-solid fa-floppy-disk"></i> Save Deity</button>
         </div>
       </form>
     {{else}}
@@ -79,15 +79,15 @@
                 {{#if selected.symbol}}<span><i class="fa-solid fa-star"></i> {{selected.symbol}}</span>{{/if}}
               </div>
               <div class="gods-hero-actions">
-                <button type="button" class="gods-primary" data-action="editGod"><i class="fa-solid fa-pen"></i> Редакция</button>
-                <button type="button" class="gods-outline" data-action="copyGod"><i class="fa-solid fa-copy"></i> Дублирай</button>
-                <button type="button" class="gods-danger" data-action="deleteGod" title="Изтрий"><i class="fa-solid fa-trash"></i></button>
+                <button type="button" class="gods-primary" data-action="editGod"><i class="fa-solid fa-pen"></i> Edit</button>
+                <button type="button" class="gods-outline" data-action="copyGod"><i class="fa-solid fa-copy"></i> Duplicate</button>
+                <button type="button" class="gods-danger" data-action="deleteGod" title="Delete"><i class="fa-solid fa-trash"></i></button>
               </div>
             </div>
           </header>
           <div class="gods-profile-content">
             {{#if selected.summary}}<section class="gods-lead">{{selected.summary}}</section>{{/if}}
-            {{#if selected.plane}}<div class="gods-fact"><i class="fa-solid fa-location-dot"></i> <strong>Дом / план:</strong> {{selected.plane}}</div>{{/if}}
+            {{#if selected.plane}}<div class="gods-fact"><i class="fa-solid fa-location-dot"></i> <strong>Divine Realm / Plane:</strong> {{selected.plane}}</div>{{/if}}
             {{#each groups}}
               <section class="gods-info-group"><h2>{{title}}</h2>
                 {{#each fields}}
@@ -99,8 +99,8 @@
         </div>
       {{else}}
         <div class="gods-welcome"><i class="fa-solid fa-sun"></i><h2>Divine Codex</h2>
-          <p>Добави първото божество към кампанията си.</p>
-          <button type="button" class="gods-primary" data-action="addGod">+ Добави божество</button>
+          <p>Add the first deity to your campaign.</p>
+          <button type="button" class="gods-primary" data-action="addGod">+ Add Deity</button>
         </div>
       {{/if}}
     {{/if}}
