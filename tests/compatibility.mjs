@@ -3,9 +3,10 @@
 import assert from "node:assert/strict";
 
 const callbacks = {};
+const events = {};
 globalThis.Hooks = {
   once(event, callback) { callbacks[event] = callback; },
-  on() {}
+  on(event, callback) { events[event] = callback; }
 };
 
 const notices = { warnings: [], errors: [] };
@@ -55,7 +56,14 @@ globalThis.JournalEntry = {
     const item = {
       ...document,
       getFlag(module, key) { return this.flags[module][key]; },
-      async setFlag(module, key, value) { this.flags[module][key] = value; }
+      async setFlag(module, key, value) { this.flags[module][key] = value; },
+      async update(changes) {
+        for (const [path, value] of Object.entries(changes)) {
+          if (path === "flags.gods.records") this.flags.gods.records = value;
+          if (path === "flags.gods.schema") this.flags.gods.schema = value;
+        }
+        return this;
+      }
     };
     game.journal.contents.push(item);
     return item;
@@ -73,13 +81,38 @@ callbacks.init();
 assert.equal(menus.get("gods.openCodex").restricted, true, "Only GMs see menu");
 callbacks.ready();
 assert.equal(game.gods.compatibility().supported, true, "Exact V14/dnd5e 5.3.3 supported");
+assert.equal(typeof events.getSceneControlButtons, "function");
+const controls = { tokens: { name: "tokens", tools: {} } };
+events.getSceneControlButtons(controls);
+assert.equal(controls.gods.visible, true, "Gods scene control is visible to GM");
+assert.equal(controls.gods.tools.openCodex.button, true);
+assert.equal(typeof controls.gods.onChange, "function");
+assert.equal(typeof controls.gods.tools.openCodex.onChange, "function");
 await game.gods.open();
 assert.equal(createCount, 1);
 assert.equal(game.journal.contents.length, 1);
 assert.equal(game.journal.contents[0].ownership.default, 0);
 assert.ok(game.journal.contents[0].flags.gods.records.length >= 30);
+assert.equal(game.journal.contents[0].flags.gods.schema, 2);
 await game.gods.open();
 assert.equal(createCount, 1, "Never overwrite old data");
+
+// Simulate upgrading a pre-English v0.1.1 world, preserving the GM's edits.
+const { LEGACY_DEITIES } = await import("../data/legacy.js");
+const db = game.journal.contents[0];
+const originalSelune = LEGACY_DEITIES.find(god => god.id === "selune");
+const oldSelune = db.flags.gods.records.find(god => god.id === "selune");
+oldSelune.summary = originalSelune.summary;
+oldSelune.title = "GM's custom title";
+oldSelune.history = "GM's private custom history";
+db.flags.gods.schema = 1;
+await game.gods.open();
+assert.equal(db.flags.gods.schema, 2, "Older world should migrate");
+const newSelune = db.flags.gods.records.find(god => god.id === "selune");
+assert.match(newSelune.summary, /Lady of Silver/, "Unedited old Bulgarian seed becomes English");
+assert.equal(newSelune.title, "GM's custom title", "Custom fields are never overwritten");
+assert.equal(newSelune.history, "GM's private custom history", "GM-authored history is preserved");
+assert.equal(createCount, 1, "Existing Journal must never be recreated");
 
 const MenuApp = menus.get("gods.openCodex").type;
 assert.notEqual(new MenuApp()._canRender({}), false, "GM on correct version can render");
@@ -103,9 +136,12 @@ game.system.id = "pf2e";
 assert.equal(game.gods.compatibility().supported, false);
 game.system.id = "dnd5e";
 game.user.isGM = false;
+const playerControls = { tokens: { name: "tokens", tools: {} } };
+events.getSceneControlButtons(playerControls);
+assert.equal(playerControls.gods, undefined, "No Gods scene control for players");
 assert.equal(new MenuApp()._canRender({}), false);
 await game.gods.open();
 assert.equal(createCount, 1, "Player cannot create journal");
 assert.equal(notices.errors.length, 0);
 
-console.log("PASS: Foundry V14 + dnd5e 5.3.3; blocked wrong core, wrong system versions, and players; data preserved.");
+console.log("PASS: Foundry V14 + dnd5e 5.3.3; scene-controls icon GM-only; English migration preserves DM edits; incompatible versions blocked.");
