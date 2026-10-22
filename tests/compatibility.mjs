@@ -21,6 +21,7 @@ class FakeApplicationV2 {
   constructor() { this.rendered = false; }
   _canRender() { /* returning undefined allows rendering in V14 */ }
   async _prepareContext() { return {}; }
+  _onRender() {}
   async render() { this.rendered = true; return this; }
   bringToFront() {}
 }
