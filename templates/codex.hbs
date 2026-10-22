@@ -1,0 +1,108 @@
+<section class="gods-codex">
+  <aside class="gods-sidebar">
+    <div class="gods-sidebar-title">
+      <div><span class="gods-eyebrow">DIVINE ENCYCLOPEDIA</span><h2><i class="fa-solid fa-book-open"></i> Gods</h2></div>
+      <button type="button" data-action="addGod" class="gods-icon-button" title="Добави бог"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <div class="gods-search-wrap">
+      <label class="gods-search"><i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" data-role="search" value="{{search}}" placeholder="Търси бог, символ, домейн, история...">
+      </label>
+      <select data-role="pantheon" aria-label="Филтрирай по пантеон">
+        <option value="">Всички пантеони</option>
+        {{#each pantheons}}
+          <option value="{{this}}" {{#if (eq this ../pantheon)}}selected{{/if}}>{{this}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="gods-list-meta"><span>БОЖЕСТВА</span><span data-role="result-count">{{total}} / {{total}}</span></div>
+    <div class="gods-list">
+      {{#each entries}}
+        <button type="button" class="gods-entry {{#if active}}is-active{{/if}}" data-action="selectGod" data-id="{{id}}">
+          <img class="gods-portrait gods-entry-art" src="{{image}}" alt="" loading="lazy">
+          <span class="gods-entry-copy"><strong>{{name}}</strong><small>{{title}}</small><em>{{pantheon}}</em></span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      {{/each}}
+      <div class="gods-empty-list" data-role="empty-results" hidden>Няма намерени богове. Промени търсенето.</div>
+    </div>
+    <div class="gods-sidebar-bottom">
+      <span><i class="fa-solid fa-lock"></i> GM ONLY</span>
+      <div>
+        <button type="button" class="gods-text-button" data-action="importGods" title="Импорт от резервно копие"><i class="fa-solid fa-file-import"></i> Import</button>
+        <button type="button" class="gods-text-button" data-action="exportGods" title="Резервно копие с DM тайните"><i class="fa-solid fa-file-export"></i> Backup</button>
+      </div>
+      <input type="file" accept="application/json,.json" data-role="import-file" hidden>
+    </div>
+  </aside>
+  <main class="gods-main">
+    {{#if editing}}
+      <div class="gods-edit-header"><div><span class="gods-eyebrow">GM EDITOR</span><h2>Профил на божество</h2></div>
+        <button type="button" data-action="cancelEdit" class="gods-outline"><i class="fa-solid fa-xmark"></i> Откажи</button>
+      </div>
+      <form data-gods-editor class="gods-editor">
+        <div class="gods-image-editor">
+          <img class="gods-portrait" data-role="image-preview" src="{{image}}" alt="Изображение">
+          <label><strong>Изображение на божеството</strong><small>Избери файл от Foundry или въведи път / URL.</small>
+            <input type="text" name="image" value="{{image}}" placeholder="modules/gods/assets/deities/unknown.svg">
+          </label>
+          <button type="button" data-action="chooseImage" class="gods-outline"><i class="fa-solid fa-image"></i> Избери</button>
+        </div>
+        {{#each editGroups}}
+          <section class="gods-edit-group"><h3>{{title}}</h3><div class="gods-form-grid">
+            {{#each fields}}
+              <label class="{{#if multiline}}gods-full-span{{/if}}"><span>{{label}}</span>
+                {{#if multiline}}<textarea name="{{key}}" rows="3">{{value}}</textarea>
+                {{else}}<input type="text" name="{{key}}" value="{{value}}">{{/if}}
+              </label>
+            {{/each}}
+          </div></section>
+        {{/each}}
+        <div class="gods-editor-actions">
+          <button type="button" data-action="cancelEdit" class="gods-outline">Откажи</button>
+          <button type="submit" class="gods-primary"><i class="fa-solid fa-floppy-disk"></i> Запази божеството</button>
+        </div>
+      </form>
+    {{else}}
+      {{#if selected}}
+        <div class="gods-profile">
+          <header class="gods-hero">
+            <img class="gods-portrait gods-hero-art" src="{{selected.image}}" alt="{{selected.name}}">
+            <div class="gods-hero-content">
+              <span class="gods-eyebrow">{{selected.pantheon}} <i class="fa-solid fa-diamond"></i> {{selected.category}}</span>
+              <h1>{{selected.name}}</h1>
+              {{#if selected.title}}<p class="gods-hero-title">{{selected.title}}</p>{{/if}}
+              {{#if selected.aliases}}<p class="gods-aliases">{{selected.aliases}}</p>{{/if}}
+              <div class="gods-tags">
+                {{#if selected.domains}}<span><i class="fa-solid fa-sparkles"></i> {{selected.domains}}</span>{{/if}}
+                {{#if selected.alignment}}<span>{{selected.alignment}}</span>{{/if}}
+                {{#if selected.symbol}}<span><i class="fa-solid fa-star"></i> {{selected.symbol}}</span>{{/if}}
+              </div>
+              <div class="gods-hero-actions">
+                <button type="button" class="gods-primary" data-action="editGod"><i class="fa-solid fa-pen"></i> Редакция</button>
+                <button type="button" class="gods-outline" data-action="copyGod"><i class="fa-solid fa-copy"></i> Дублирай</button>
+                <button type="button" class="gods-danger" data-action="deleteGod" title="Изтрий"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </header>
+          <div class="gods-profile-content">
+            {{#if selected.summary}}<section class="gods-lead">{{selected.summary}}</section>{{/if}}
+            {{#if selected.plane}}<div class="gods-fact"><i class="fa-solid fa-location-dot"></i> <strong>Дом / план:</strong> {{selected.plane}}</div>{{/if}}
+            {{#each groups}}
+              <section class="gods-info-group"><h2>{{title}}</h2>
+                {{#each fields}}
+                  <div class="gods-info-field"><h3>{{label}}</h3><p>{{value}}</p></div>
+                {{/each}}
+              </section>
+            {{/each}}
+          </div>
+        </div>
+      {{else}}
+        <div class="gods-welcome"><i class="fa-solid fa-sun"></i><h2>Divine Codex</h2>
+          <p>Добави първото божество към кампанията си.</p>
+          <button type="button" class="gods-primary" data-action="addGod">+ Добави божество</button>
+        </div>
+      {{/if}}
+    {{/if}}
+  </main>
+</section>

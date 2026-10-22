@@ -1,0 +1,84 @@
+/* Gods — Divine Codex v0.1.0 | isolated styles */
+.gods-codex-window { --gods-bg:#141820; --gods-panel:#1a202b; --gods-text:#f0e8d9; --gods-muted:#a5afbf; --gods-gold:#d7aa64; --gods-line:rgba(228,200,153,.14); }
+.gods-codex-window .window-content { padding:0; overflow:hidden; background:var(--gods-bg); color:var(--gods-text); }
+.gods-codex-window button,.gods-codex-window input,.gods-codex-window textarea,.gods-codex-window select { font:inherit; }
+.gods-codex { height:100%; min-height:440px; display:grid; grid-template-columns:330px minmax(0,1fr); color:var(--gods-text); background:var(--gods-bg); }
+.gods-codex button { cursor:pointer; }
+.gods-sidebar { min-height:0; display:flex; flex-direction:column; border-right:1px solid var(--gods-line); background:#111720; }
+.gods-sidebar-title { padding:21px 19px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.gods-eyebrow { font-size:10px; color:var(--gods-gold); font-weight:750; letter-spacing:1.8px; text-transform:uppercase; }
+.gods-sidebar h2 { margin:6px 0 0; font-family:Georgia,serif; font-size:27px; color:#f6e9d5; }
+.gods-sidebar h2 i { font-size:22px; color:var(--gods-gold); margin-right:6px; }
+.gods-icon-button { width:36px; height:36px; color:var(--gods-gold); background:#2b3039; border:1px solid var(--gods-line); border-radius:8px; }
+.gods-search-wrap { padding:4px 14px 12px; display:grid; gap:8px; }
+.gods-search { background:#222b36; border:1px solid var(--gods-line); border-radius:8px; display:flex; gap:8px; align-items:center; padding:0 12px; color:#d7aa64; }
+.gods-search input { min-width:0; width:100%; height:39px; background:transparent; border:0; outline:0; color:white; box-shadow:none; }
+.gods-search-wrap select { height:34px; background:#222b36; color:var(--gods-text); border:1px solid var(--gods-line); border-radius:8px; padding:0 10px; }
+.gods-list-meta { display:flex; justify-content:space-between; padding:4px 18px 9px; font-size:10px; letter-spacing:1.4px; font-weight:700; color:var(--gods-muted); }
+.gods-list { overflow-y:auto; min-height:0; flex:1; padding:0 7px 9px; }
+.gods-entry { width:100%; display:flex; gap:12px; align-items:center; text-align:left; background:transparent; color:var(--gods-text); border:1px solid transparent; padding:7px; border-radius:9px; min-height:74px; margin-bottom:4px; }
+.gods-entry:hover { background:#222a34; }
+.gods-entry.is-active { background:#2b2b2c; border-color:rgba(215,170,100,.38); }
+.gods-entry[hidden] { display:none !important; }
+.gods-entry-art { flex:0 0 53px; width:53px; height:59px; object-fit:cover; border-radius:6px; border:1px solid rgba(215,170,100,.2); }
+.gods-entry-copy { min-width:0; flex:1; display:grid; gap:3px; }
+.gods-entry-copy strong { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:14px; }
+.gods-entry-copy small { color:#b8bfca; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.gods-entry-copy em { color:#c19c6b; font-size:10px; font-style:normal; }
+.gods-entry > i { color:#9b825d; font-size:10px; }
+.gods-empty-list { padding:25px 10px; text-align:center; color:var(--gods-muted); }
+.gods-sidebar-bottom { border-top:1px solid var(--gods-line); display:flex; gap:6px; flex-direction:column; padding:10px 13px; font-size:10px; letter-spacing:1px; color:var(--gods-gold); }
+.gods-sidebar-bottom > div { display:flex; gap:6px; justify-content:space-between; }
+.gods-text-button { flex:1; min-height:27px; border-radius:5px; border:1px solid var(--gods-line); background:#222a35; color:var(--gods-text); font-size:11px; }
+.gods-main { min-width:0; min-height:0; overflow-y:auto; background:radial-gradient(ellipse at top right,#222631 0,#141820 64%); }
+.gods-hero { display:flex; min-height:275px; position:relative; background:#222530; border-bottom:1px solid var(--gods-line); }
+.gods-hero-art { display:block; width:235px; max-width:37%; object-fit:cover; object-position:center; align-self:stretch; background:#171c25; }
+.gods-hero-content { flex:1; min-width:0; padding:33px 28px 24px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
+.gods-hero-content h1 { font-family:Georgia,serif; font-size:clamp(32px,4vw,47px); color:#fff1db; margin:8px 0 0; line-height:1.08; }
+.gods-hero-title { margin:8px 0 0; color:#f1d1a0; font-family:Georgia,serif; font-size:17px; }
+.gods-aliases { color:#bfc1cb; font-size:12px; margin:7px 0 0; }
+.gods-tags { display:flex; flex-wrap:wrap; gap:7px; margin:16px 0 19px; }
+.gods-tags span { background:#3a3740; border:1px solid rgba(215,170,100,.28); border-radius:12px; padding:4px 9px; color:#e5d5bb; font-size:11px; }
+.gods-hero-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.gods-primary,.gods-outline,.gods-danger { padding:8px 13px; border-radius:7px; font-size:12px; border:1px solid transparent; }
+.gods-primary { background:#cf9f5e; color:#131820; font-weight:700; }
+.gods-primary:hover { background:#e1b877; }
+.gods-outline { background:#292c35; color:#efe3d2; border-color:#6b6155; }
+.gods-danger { background:#3e2225; border-color:#79474c; color:#e6a6ae; }
+.gods-profile-content { max-width:875px; padding:25px 33px 42px; }
+.gods-lead { font-size:15px; line-height:1.75; color:#f2e5d1; border-left:3px solid var(--gods-gold); padding:12px 18px; background:rgba(215,170,100,.08); white-space:pre-wrap; }
+.gods-fact { margin:14px 0; font-size:12px; color:#cfc5b5; }
+.gods-info-group { margin-top:28px; }
+.gods-info-group h2 { border-bottom:1px solid var(--gods-line); padding-bottom:8px; margin:0 0 18px; font-family:Georgia,serif; color:#e2b979; font-size:20px; }
+.gods-info-field { margin:0 0 19px; }
+.gods-info-field h3 { font-size:12px; letter-spacing:.5px; color:#f2d4a7; font-weight:700; margin:0 0 7px; }
+.gods-info-field p { margin:0; font-size:13px; line-height:1.7; color:#d0d1d5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.gods-edit-header { padding:21px 30px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gods-line); }
+.gods-edit-header h2 { font-family:Georgia,serif; font-size:25px; margin:4px 0 0; color:#f2dfc2; }
+.gods-editor { padding:20px 30px 35px; display:grid; gap:18px; }
+.gods-image-editor { display:flex; gap:15px; align-items:center; background:#212631; padding:14px; border:1px solid var(--gods-line); border-radius:9px; }
+.gods-image-editor img { width:85px; height:105px; object-fit:cover; border-radius:5px; background:#111721; }
+.gods-image-editor label { flex:1; min-width:0; display:grid; gap:7px; color:#eed8b7; font-size:12px; }
+.gods-image-editor small { color:var(--gods-muted); }
+.gods-edit-group { border:1px solid var(--gods-line); border-radius:9px; padding:18px; background:#1a202a; }
+.gods-edit-group h3 { margin:0 0 15px; color:#e2b979; font-family:Georgia,serif; font-size:17px; }
+.gods-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.gods-form-grid label { display:grid; align-content:start; gap:5px; color:#ded7cb; font-size:12px; }
+.gods-form-grid .gods-full-span { grid-column:1/-1; }
+.gods-editor input,.gods-editor textarea { width:100%; color:#f6f0e6; background:#10161f; border:1px solid #525462; border-radius:5px; padding:8px; outline:0; box-shadow:none; }
+.gods-editor textarea { resize:vertical; min-height:75px; }
+.gods-editor input:focus,.gods-editor textarea:focus { border-color:var(--gods-gold); }
+.gods-editor-actions { display:flex; justify-content:flex-end; gap:10px; padding:8px 0 20px; }
+.gods-welcome { min-height:400px; display:flex; flex-direction:column; gap:15px; align-items:center; justify-content:center; color:#ddcaaa; }
+.gods-welcome i { font-size:54px; color:#c9a76d; }
+.gods-welcome h2 { font-family:Georgia,serif; font-size:36px; margin:0; }
+.gods-welcome p { margin:0; }
+.gods-open-button { margin:7px 0; display:block; width:100%; padding:8px; background:#34303a; color:#f0d3a1; border:1px solid #8c7048; border-radius:5px; }
+@media(max-width:760px) {
+  .gods-codex { grid-template-columns:215px minmax(0,1fr); }
+  .gods-hero-art { width:130px; }
+  .gods-hero-content { padding:18px; }
+  .gods-profile-content { padding:20px; }
+  .gods-form-grid { grid-template-columns:1fr; }
+  .gods-image-editor { flex-wrap:wrap; }
+}
