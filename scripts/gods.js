@@ -160,6 +160,42 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     this.search = "";
     this.pantheon = "";
     this.entries = [];
+    // Both columns are independently scrollable. Keep their positions across V14 part rerenders.
+    this._listScrollTop = 0;
+    this._detailScrollTop = 0;
+  }
+
+  /**
+   * Foundry's ApplicationV2 can replace the entire Handlebars part when a deity is selected.
+   * Snapshot the old DOM before that happens, so the list cannot jump back to its first entry.
+   */
+  _captureScrollPositions({ resetDetails = false } = {}) {
+    const list = this.element?.querySelector(".gods-list");
+    const main = this.element?.querySelector(".gods-main");
+    if (list) this._listScrollTop = list.scrollTop;
+    if (main) this._detailScrollTop = main.scrollTop;
+    if (resetDetails) this._detailScrollTop = 0;
+  }
+
+  _restoreScrollPositions() {
+    const list = this.element?.querySelector(".gods-list");
+    const main = this.element?.querySelector(".gods-main");
+    if (list) {
+      list.scrollTop = this._listScrollTop;
+      list.addEventListener("scroll", () => {
+        if (this.element?.querySelector(".gods-list") === list) {
+          this._listScrollTop = list.scrollTop;
+        }
+      }, { passive: true });
+    }
+    if (main) {
+      main.scrollTop = this._detailScrollTop;
+      main.addEventListener("scroll", () => {
+        if (this.element?.querySelector(".gods-main") === main) {
+          this._detailScrollTop = main.scrollTop;
+        }
+      }, { passive: true });
+    }
   }
 
   _canRender(options) {
@@ -233,6 +269,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
       image.addEventListener("error", () => { if (!image.src.endsWith("/unknown.svg")) image.src = IMAGE_FALLBACK; }, { once: true });
     });
     this.filterList();
+    this._restoreScrollPositions();
   }
 
   filterList() {
@@ -255,6 +292,8 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 
   selectGod(id) {
     if (!hasAccess()) return;
+    if (!this.editing && this.selectedId === id) return; // No needless scroll-changing render.
+    this._captureScrollPositions({ resetDetails: true });
     this.selectedId = id;
     this.editing = false;
     this.draft = null;
@@ -263,6 +302,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 
   addGod() {
     if (!hasAccess()) return;
+    this._captureScrollPositions({ resetDetails: true });
     this.draft = cleanRecord({ id: newId(), pantheon: "Averis", category: "Deity" });
     this.editing = true;
     return this.render();
@@ -270,6 +310,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 
   editGod() {
     if (!hasAccess()) return;
+    this._captureScrollPositions({ resetDetails: true });
     const selected = this.entries.find(entry => entry.id === this.selectedId);
     if (!selected) return;
     this.draft = { ...selected };
@@ -279,6 +320,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 
   copyGod() {
     if (!hasAccess()) return;
+    this._captureScrollPositions({ resetDetails: true });
     const selected = this.entries.find(entry => entry.id === this.selectedId);
     if (!selected) return;
     this.draft = { ...selected, id: newId(), name: selected.name + " (copy)" };
@@ -287,6 +329,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   cancelEdit() {
+    this._captureScrollPositions({ resetDetails: true });
     this.draft = null;
     this.editing = false;
     return this.render();
