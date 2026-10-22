@@ -10,8 +10,8 @@ manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
 assert manifest["compatibility"]["minimum"] == "14"
 assert manifest["compatibility"]["maximum"] == "14"
-assert manifest["version"] == "0.2.0"
-assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.0/gods-v0.2.0.zip"
+assert manifest["version"] == "0.2.1"
+assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.1/gods-v0.2.1.zip"
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
