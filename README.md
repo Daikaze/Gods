@@ -10,7 +10,7 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Enable **Gods — Divine Codex** in your world. In the **Settings** sidebar, click **Gods — Divine Codex**. As a fallback, GM can run `game.gods.open()` from the browser console.
+Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
 
 ## Included features (v0.1.0)
 
