@@ -13,7 +13,26 @@
 .gods-search-wrap { padding:4px 14px 12px; display:grid; gap:8px; }
 .gods-search { background:#222b36; border:1px solid var(--gods-line); border-radius:8px; display:flex; gap:8px; align-items:center; padding:0 12px; color:#d7aa64; }
 .gods-search input { min-width:0; width:100%; height:39px; background:transparent; border:0; outline:0; color:white; box-shadow:none; }
-.gods-search-wrap select { height:34px; background:#222b36; color:var(--gods-text); border:1px solid var(--gods-line); border-radius:8px; padding:0 10px; }
+/* Force readable options on Firefox/Chromium regardless of the Foundry/global theme.
+   color-scheme:dark asks the native popup to render with dark system chrome. */
+.gods-codex-window .gods-search-wrap select {
+  height:34px; padding:0 10px; border-radius:8px;
+  background-color:#202936 !important; color:#fff2db !important;
+  border:1px solid rgba(215,170,100,.42); color-scheme:dark;
+  -webkit-text-fill-color:#fff2db;
+}
+.gods-codex-window .gods-search-wrap select:focus {
+  border-color:#e7ba73; outline:2px solid rgba(215,170,100,.45); outline-offset:1px;
+}
+.gods-codex-window .gods-search-wrap select option,
+.gods-codex-window .gods-search-wrap select optgroup {
+  background-color:#202936 !important; color:#fff2db !important;
+  -webkit-text-fill-color:#fff2db;
+}
+.gods-codex-window .gods-search-wrap select option:checked {
+  background-color:#385c89 !important; color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff;
+}
 .gods-list-meta { display:flex; justify-content:space-between; padding:4px 18px 9px; font-size:10px; letter-spacing:1.4px; font-weight:700; color:var(--gods-muted); }
 .gods-list { overflow-y:auto; min-height:0; flex:1; padding:0 7px 9px; }
 .gods-entry { width:100%; display:flex; gap:12px; align-items:center; text-align:left; background:transparent; color:var(--gods-text); border:1px solid transparent; padding:7px; border-radius:9px; min-height:74px; margin-bottom:4px; }
@@ -32,7 +51,26 @@
 .gods-text-button { flex:1; min-height:27px; border-radius:5px; border:1px solid var(--gods-line); background:#222a35; color:var(--gods-text); font-size:11px; }
 .gods-main { min-width:0; min-height:0; overflow-y:auto; background:radial-gradient(ellipse at top right,#222631 0,#141820 64%); }
 .gods-hero { display:flex; min-height:275px; position:relative; background:#222530; border-bottom:1px solid var(--gods-line); }
-.gods-hero-art { display:block; width:235px; max-width:37%; object-fit:cover; object-position:center; align-self:stretch; background:#171c25; }
+.gods-hero-image-button {
+  position:relative; display:block; align-self:stretch; flex:0 0 235px;
+  max-width:37%; min-width:0; min-height:275px; margin:0; padding:0;
+  background:#171c25; border:0; border-radius:0; overflow:hidden;
+  color:#fff2db; cursor:pointer; box-shadow:none;
+}
+.gods-hero-image-button:hover, .gods-hero-image-button:focus-visible {
+  filter:brightness(1.1); box-shadow:inset 0 0 0 2px var(--gods-gold);
+}
+.gods-hero-image-button:focus-visible { outline:2px solid var(--gods-gold); outline-offset:-2px; }
+.gods-hero-image-button .gods-hero-art {
+  display:block; width:100%; max-width:none; height:100%; min-height:275px;
+  object-fit:cover; object-position:center; background:#171c25;
+}
+.gods-hero-image-hint {
+  position:absolute; right:9px; bottom:9px; padding:6px 9px; border-radius:7px;
+  display:flex; align-items:center; gap:5px; font-size:11px;
+  background:rgba(12,18,27,.92); color:#f8e9cf;
+  border:1px solid rgba(215,170,100,.55); pointer-events:none;
+}
 .gods-hero-content { flex:1; min-width:0; padding:33px 28px 24px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
 .gods-hero-content h1 { font-family:Georgia,serif; font-size:clamp(32px,4vw,47px); color:#fff1db; margin:8px 0 0; line-height:1.08; }
 .gods-hero-title { margin:8px 0 0; color:#f1d1a0; font-family:Georgia,serif; font-size:17px; }
@@ -73,10 +111,11 @@
 .gods-welcome i { font-size:54px; color:#c9a76d; }
 .gods-welcome h2 { font-family:Georgia,serif; font-size:36px; margin:0; }
 .gods-welcome p { margin:0; }
+.gods-image-menu-preview { display:block; width:100%; max-height:260px; margin:12px auto; object-fit:contain; border-radius:8px; }
 .gods-open-button { margin:7px 0; display:block; width:100%; padding:8px; background:#34303a; color:#f0d3a1; border:1px solid #8c7048; border-radius:5px; }
 @media(max-width:760px) {
   .gods-codex { grid-template-columns:215px minmax(0,1fr); }
-  .gods-hero-art { width:130px; }
+  .gods-hero-image-button { flex-basis:130px; }
   .gods-hero-content { padding:18px; }
   .gods-profile-content { padding:20px; }
   .gods-form-grid { grid-template-columns:1fr; }
