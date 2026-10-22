@@ -87,7 +87,7 @@ globalThis.JournalEntry = {
   }
 };
 globalThis.Handlebars = {
-  escapeExpression(text) { return String(text).replaceAll("<", "&lt;"); }
+  escapeExpression(text) { return String(text).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;"); }
 };
 
 await import("../scripts/gods.js");
