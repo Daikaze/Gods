@@ -10,8 +10,8 @@ manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
 assert manifest["compatibility"]["minimum"] == "14"
 assert manifest["compatibility"]["maximum"] == "14"
-assert manifest["version"] == "0.2.4"
-assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.4/gods-v0.2.4.zip"
+assert manifest["version"] == "0.2.5"
+assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.5/gods-v0.2.5.zip"
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
@@ -57,6 +57,17 @@ assert 'deityImageAction: function' in js
 assert 'ChatMessage.create' in js and 'popout.shareImage()' in js
 css = (ROOT / "styles" / "gods.css").read_text(encoding="utf-8")
 assert "color-scheme:dark" in css and "select option" in css, "Readable dropdown options required."
+# Portraits must be letterboxed rather than cropped at every point in the UI.
+assert "object-fit:cover" not in css, "Do not crop deity portraits."
+for selector in (
+    ".gods-entry-art", ".gods-hero-image-button .gods-hero-art",
+    ".gods-image-editor img", ".gods-image-menu-preview"
+):
+    match = re.search(r"(?m)^" + re.escape(selector) + r"\s*\{([^}]+)\}", css)
+    assert match and "object-fit:contain" in match.group(1), "Portrait must use contain: " + selector
+assert "height:calc(100% - 62px)" in css, "Full hero must reserve a strip for image actions."
+assert "min-height:410px" in css, "Give full-body art a usable viewport."
+
 assert not re.search(r"[\u0400-\u04FF]", template), "UI must be fully English."
 assert not re.search(r"[\u0400-\u04FF]", js), "Module code/messages must be English."
 assert not re.search(r"[\u0400-\u04FF]", src), "All bundled deity text must be English."

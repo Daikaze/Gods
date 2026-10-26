@@ -1,4 +1,4 @@
-/* Gods — Divine Codex v0.1.0 | isolated styles */
+/* Gods — Divine Codex v0.2.5 | isolated styles */
 .gods-codex-window { --gods-bg:#141820; --gods-panel:#1a202b; --gods-text:#f0e8d9; --gods-muted:#a5afbf; --gods-gold:#d7aa64; --gods-line:rgba(228,200,153,.14); }
 .gods-codex-window .window-content { padding:0; overflow:hidden; background:var(--gods-bg); color:var(--gods-text); }
 .gods-codex-window button,.gods-codex-window input,.gods-codex-window textarea,.gods-codex-window select { font:inherit; }
@@ -39,7 +39,11 @@
 .gods-entry:hover { background:#222a34; }
 .gods-entry.is-active { background:#2b2b2c; border-color:rgba(215,170,100,.38); }
 .gods-entry[hidden] { display:none !important; }
-.gods-entry-art { flex:0 0 53px; width:53px; height:59px; object-fit:cover; border-radius:6px; border:1px solid rgba(215,170,100,.2); }
+.gods-entry-art {
+  flex:0 0 53px; width:53px; height:59px;
+  object-fit:contain; object-position:center; background:#171c25;
+  border-radius:6px; border:1px solid rgba(215,170,100,.2);
+}
 .gods-entry-copy { min-width:0; flex:1; display:grid; gap:3px; }
 .gods-entry-copy strong { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:14px; }
 .gods-entry-copy small { color:#b8bfca; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
@@ -54,26 +58,41 @@
 .gods-sidebar-bottom > div { display:flex; gap:6px; justify-content:space-between; }
 .gods-text-button { flex:1; min-height:27px; border-radius:5px; border:1px solid var(--gods-line); background:#222a35; color:var(--gods-text); font-size:11px; }
 .gods-main { min-width:0; min-height:0; overflow-y:auto; background:radial-gradient(ellipse at top right,#222631 0,#141820 64%); }
-.gods-hero { display:flex; min-height:275px; position:relative; background:#222530; border-bottom:1px solid var(--gods-line); }
+/* Full-portrait hero: art always fits inside a dedicated media panel.
+   Image is removed from layout sizing so extremely tall/wide files cannot
+   stretch or clip the profile. Media controls reserve their own bottom strip. */
+.gods-hero {
+  display:flex; min-height:410px; align-items:stretch; position:relative;
+  background:#222530; border-bottom:1px solid var(--gods-line);
+}
 .gods-hero-image-button {
-  position:relative; display:block; align-self:stretch; flex:0 0 235px;
-  max-width:37%; min-width:0; min-height:275px; margin:0; padding:0;
-  background:#171c25; border:0; border-radius:0; overflow:hidden;
-  color:#fff2db; cursor:pointer; box-shadow:none;
+  position:relative; display:block; align-self:stretch;
+  flex:0 0 300px; width:300px; max-width:42%;
+  min-width:0; min-height:410px; margin:0; padding:0;
+  color:#fff2db; cursor:pointer; border:0; border-right:1px solid var(--gods-line);
+  border-radius:0; overflow:hidden; box-shadow:none;
+  background:radial-gradient(ellipse at center, #273142 0%, #171c25 76%);
 }
-.gods-hero-image-button:hover, .gods-hero-image-button:focus-visible {
-  filter:brightness(1.1); box-shadow:inset 0 0 0 2px var(--gods-gold);
+.gods-hero-image-button:hover,
+.gods-hero-image-button:focus-visible {
+  box-shadow:inset 0 0 0 2px var(--gods-gold);
 }
-.gods-hero-image-button:focus-visible { outline:2px solid var(--gods-gold); outline-offset:-2px; }
+.gods-hero-image-button:focus-visible {
+  outline:2px solid var(--gods-gold); outline-offset:-2px;
+}
 .gods-hero-image-button .gods-hero-art {
-  display:block; width:100%; max-width:none; height:100%; min-height:275px;
-  object-fit:cover; object-position:center; background:#171c25;
+  position:absolute; top:12px; left:12px;
+  width:calc(100% - 24px); height:calc(100% - 62px);
+  min-width:0; max-width:none; min-height:0; max-height:none;
+  display:block; object-fit:contain; object-position:center center;
+  background:transparent;
 }
 .gods-hero-image-hint {
-  position:absolute; right:9px; bottom:9px; padding:6px 9px; border-radius:7px;
-  display:flex; align-items:center; gap:5px; font-size:11px;
-  background:rgba(12,18,27,.92); color:#f8e9cf;
-  border:1px solid rgba(215,170,100,.55); pointer-events:none;
+  position:absolute; left:12px; right:12px; bottom:10px;
+  min-height:32px; display:flex; justify-content:center; align-items:center; gap:6px;
+  padding:5px 9px; border-radius:7px; font-size:11px;
+  background:#121923; color:#f8e9cf; border:1px solid rgba(215,170,100,.55);
+  pointer-events:none;
 }
 .gods-hero-content { flex:1; min-width:0; padding:33px 28px 24px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
 .gods-hero-content h1 { font-family:Georgia,serif; font-size:clamp(32px,4vw,47px); color:#fff1db; margin:8px 0 0; line-height:1.08; }
@@ -99,7 +118,7 @@
 .gods-edit-header h2 { font-family:Georgia,serif; font-size:25px; margin:4px 0 0; color:#f2dfc2; }
 .gods-editor { padding:20px 30px 35px; display:grid; gap:18px; }
 .gods-image-editor { display:flex; gap:15px; align-items:center; background:#212631; padding:14px; border:1px solid var(--gods-line); border-radius:9px; }
-.gods-image-editor img { width:85px; height:105px; object-fit:cover; border-radius:5px; background:#111721; }
+.gods-image-editor img { width:85px; height:105px; object-fit:contain; object-position:center; border-radius:5px; background:#111721; }
 .gods-image-editor label { flex:1; min-width:0; display:grid; gap:7px; color:#eed8b7; font-size:12px; }
 .gods-image-editor small { color:var(--gods-muted); }
 .gods-edit-group { border:1px solid var(--gods-line); border-radius:9px; padding:18px; background:#1a202a; }
@@ -107,7 +126,7 @@
 .gods-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
 .gods-form-grid label { display:grid; align-content:start; gap:5px; color:#ded7cb; font-size:12px; }
 .gods-form-grid .gods-full-span { grid-column:1/-1; }
- .gods-editor input,.gods-editor textarea,.gods-editor select { width:100%; color:#f6f0e6; background:#10161f; border:1px solid #525462; border-radius:5px; padding:8px; outline:0; box-shadow:none; }
+.gods-editor input,.gods-editor textarea,.gods-editor select { width:100%; color:#f6f0e6; background:#10161f; border:1px solid #525462; border-radius:5px; padding:8px; outline:0; box-shadow:none; }
 .gods-editor textarea { resize:vertical; min-height:75px; }
 .gods-editor input:focus,.gods-editor textarea:focus { border-color:var(--gods-gold); }
 .gods-editor-actions { display:flex; justify-content:flex-end; gap:10px; padding:8px 0 20px; }
@@ -119,7 +138,8 @@
 .gods-open-button { margin:7px 0; display:block; width:100%; padding:8px; background:#34303a; color:#f0d3a1; border:1px solid #8c7048; border-radius:5px; }
 @media(max-width:760px) {
   .gods-codex { grid-template-columns:215px minmax(0,1fr); }
-  .gods-hero-image-button { flex-basis:130px; }
+  .gods-hero { min-height:340px; }
+  .gods-hero-image-button { flex:0 0 38%; min-height:340px; }
   .gods-hero-content { padding:18px; }
   .gods-profile-content { padding:20px; }
   .gods-form-grid { grid-template-columns:1fr; }
