@@ -1,14 +1,14 @@
 # Gods — Divine Codex
 
-**Foundry VTT V14 + D&D5e system v5.3.3 | GM-only English-language deity encyclopedia**
+**Foundry VTT V14 (14.367+) + D&D5e system v6.0.6 | GM-only English-language deity encyclopedia**
 
 Searchable, illustrated deity library built for Daikaze's Averis campaign, with a separate selection of optional D&D / Forgotten Realms reference profiles. The latter are **examples, not established Averis canon**.
 
 ## Exact compatibility
 
-- **Foundry core:** Version **14** (any stable V14 build).
-- **Game system:** `dnd5e` **exactly 5.3.3**. This is the D&D 5e game system version, **not** the Foundry build number.
-- Version 0.2.5 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
+- **Foundry core:** Version **14.367 or newer**, within generation 14.
+- **Game system:** `dnd5e` **exactly 6.0.6**. This is the D&D 5e game system version, **not** the Foundry build number.
+- Version 0.2.6 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
 - No new D&D6-only APIs are used; the UI relies on V14 `ApplicationV2` and the standard `JournalEntry` API.
 - Existing Gods records are preserved: updates do **not** replace the GM-private Journal or its edited deity entries.
 
@@ -18,9 +18,16 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.5 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.5/gods-v0.2.5.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.6 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.6/gods-v0.2.6.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
+
+## Updated in v0.2.6
+
+- Targets **Foundry V14 (build 14.367+) + D&D 5e system 6.0.6**. The exact system-version check, module manifest, automated runtime assertions, and installation package are updated together.
+- No dnd5e-specific Actor, Item, roll, or advancement APIs are used by Gods. Its deity database, images, journals, chat portrait sharing, hierarchy and GM controls remain unchanged.
+- Previous GM edits and private deity notes are preserved; no data migration is required for this compatibility update.
+- Run an in-world smoke test after installing: open the scene-control icon and a deity, edit/save a record, and share a portrait with players.
 
 ## Fixed in v0.2.5
 
@@ -85,7 +92,7 @@ Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → 
 
 ## Caveats
 
-- This is a version-targeted build for Foundry V14 + dnd5e 5.3.3. Automated static checks and mocked Foundry runtime checks do not replace an in-world smoke test.
+- This is a version-targeted build for Foundry V14 (14.367+) + dnd5e 6.0.6. Automated static checks and mocked Foundry runtime checks do not replace an in-world smoke test.
 - Art consists of bespoke symbolic vector portraits, not finished character paintings. Replace images through the editor at any time.
 - Foundry's Journal permissions protect the world database from players. Public module files and example lore remain downloadable by anyone with the repository link. Keep confidential campaign secrets in editable GM fields, not shipped seed data.
 - Multiple GMs editing the same record simultaneously can overwrite each other's changes; export a backup before large changes.
