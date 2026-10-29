@@ -278,7 +278,7 @@ assert.equal(game.gods.compatibility().supported, false);
 assert.equal(new MenuApp()._canRender({}), false);
 await game.gods.open();
 assert.equal(createCount, 1);
-assert.match(notices.warnings.at(-1), /5\.3\.3/);
+assert.match(notices.warnings.at(-1), /6\.0\.6/);
 
 game.system.version = "5.3.2";
 assert.equal(game.gods.compatibility().supported, false);
