@@ -59,7 +59,7 @@ const menus = new Map();
 globalThis.game = {
   release: { generation: 14 },
   version: "14.367",
-  system: { id: "dnd5e", version: "5.3.3" },
+  system: { id: "dnd5e", version: "6.0.6" },
   user: { isGM: true, id: "test-gm" },
   settings: {
     registerMenu(namespace, key, data) { menus.set(namespace + "." + key, data); }
@@ -97,7 +97,7 @@ assert.equal(typeof callbacks.ready, "function");
 callbacks.init();
 assert.equal(menus.get("gods.openCodex").restricted, true, "Only GMs see menu");
 callbacks.ready();
-assert.equal(game.gods.compatibility().supported, true, "Exact V14/dnd5e 5.3.3 supported");
+assert.equal(game.gods.compatibility().supported, true, "Exact V14/dnd5e 6.0.6 supported");
 assert.equal(typeof events.getSceneControlButtons, "function");
 const controls = { tokens: { name: "tokens", tools: {} } };
 events.getSceneControlButtons(controls);
@@ -283,6 +283,8 @@ assert.match(notices.warnings.at(-1), /5\.3\.3/);
 game.system.version = "5.3.2";
 assert.equal(game.gods.compatibility().supported, false);
 game.system.version = "5.3.3";
+assert.equal(game.gods.compatibility().supported, false, "Old system version must be rejected");
+game.system.version = "6.0.6";
 game.release.generation = 13;
 assert.equal(game.gods.compatibility().supported, false);
 game.release.generation = 15;
@@ -300,4 +302,4 @@ await game.gods.open();
 assert.equal(createCount, 1, "Player cannot create journal");
 assert.equal(notices.errors.length, 0);
 
-console.log("PASS: Foundry V14 + dnd5e 5.3.3; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");
+console.log("PASS: Foundry V14 + dnd5e 6.0.6; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");
