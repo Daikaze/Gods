@@ -52,5 +52,5 @@ jobs:
             exit 1
           fi
           gh release create "$TAG" "gods-v${VERSION}.zip" --target "$GITHUB_SHA" \
-            --title "Gods — Divine Codex $TAG (Foundry V14 / D&D5e 5.3.3)" \
-            --notes "GM-only deity encyclopedia. Requires Foundry V14 and dnd5e 5.3.3. Includes 34 gods and 35 local SVG images."
+            --title "Gods — Divine Codex $TAG (Foundry V14 / D&D5e 6.0.6)" \
+            --notes "GM-only deity encyclopedia. Requires Foundry V14 and dnd5e 6.0.6. Includes 53 deity profiles, local artwork, and preserved GM data."
