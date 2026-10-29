@@ -8,15 +8,15 @@ import xml.etree.ElementTree as ET
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
-assert manifest["compatibility"]["minimum"] == "14"
+assert manifest["compatibility"]["minimum"] == "14.367"
 assert manifest["compatibility"]["maximum"] == "14"
-assert manifest["version"] == "0.2.5"
-assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.5/gods-v0.2.5.zip"
+assert manifest["version"] == "0.2.6"
+assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.6/gods-v0.2.6.zip"
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
-assert systems[0]["compatibility"]["minimum"] == "5.3.3"
-assert systems[0]["compatibility"]["maximum"] == "5.3.3"
+assert systems[0]["compatibility"]["minimum"] == "6.0.6"
+assert systems[0]["compatibility"]["maximum"] == "6.0.6"
 assert manifest["version"]
 for key in ("esmodules", "styles"):
     for path in manifest[key]:
@@ -43,7 +43,7 @@ assert sum(g["pantheon"] == "Averis" for g in deities) >= 6
 ET.parse(ROOT / "assets" / "deities" / "unknown.svg")
 js = (ROOT / "scripts" / "gods.js").read_text(encoding="utf-8")
 assert 'restricted: true' in js, "Menu must be GM-only."
-assert 'SUPPORTED_SYSTEM_VERSION = "5.3.3"' in js
+assert 'SUPPORTED_SYSTEM_VERSION = "6.0.6"' in js
 assert 'SUPPORTED_FOUNDRY_GENERATION = 14' in js
 assert 'isSupported()' in js, "Operations must check system/core versions"
 assert 'hasAccess()' in js, "All mutations must be GM-gated."
