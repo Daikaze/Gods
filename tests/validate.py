@@ -10,8 +10,8 @@ manifest = json.loads((ROOT / "module.json").read_text(encoding="utf-8"))
 assert manifest["id"] == "gods"
 assert manifest["compatibility"]["minimum"] == "14.367"
 assert manifest["compatibility"]["maximum"] == "14"
-assert manifest["version"] == "0.2.6"
-assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.6/gods-v0.2.6.zip"
+assert manifest["version"] == "0.2.7"
+assert manifest["download"] == "https://github.com/Daikaze/Gods/releases/download/v0.2.7/gods-v0.2.7.zip"
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
@@ -56,17 +56,21 @@ assert 'data-action="deityImageAction"' in template, "Deity art must be clickabl
 assert 'deityImageAction: function' in js
 assert 'ChatMessage.create' in js and 'popout.shareImage()' in js
 css = (ROOT / "styles" / "gods.css").read_text(encoding="utf-8")
-assert "color-scheme:dark" in css and "select option" in css, "Readable dropdown options required."
-# Portraits must be letterboxed rather than cropped at every point in the UI.
+assert ".gods-codex-window .window-content" in css, "Only the Gods window may be styled."
+assert "container: gods-codex / inline-size" in css, "Responsive layout must follow application width."
+assert "@container gods-codex" in css
+assert "var(--color-text-primary" in css and "var(--gods-line)" in css, "Use Foundry theme colors."
+assert "color-scheme:dark" not in css, "Do not force a dark native select menu."
 assert "object-fit:cover" not in css, "Do not crop deity portraits."
 for selector in (
     ".gods-entry-art", ".gods-hero-image-button .gods-hero-art",
     ".gods-image-editor img", ".gods-image-menu-preview"
 ):
-    match = re.search(r"(?m)^" + re.escape(selector) + r"\s*\{([^}]+)\}", css)
-    assert match and "object-fit:contain" in match.group(1), "Portrait must use contain: " + selector
-assert "height:calc(100% - 62px)" in css, "Full hero must reserve a strip for image actions."
-assert "min-height:410px" in css, "Give full-body art a usable viewport."
+    match = re.search(r"(?m)^\.gods-codex-window\s+" + re.escape(selector) + r"\s*\{([^}]+)\}", css)
+    assert match and re.search(r"object-fit:\s*contain", match.group(1)), "Portrait must use contain: " + selector
+assert re.search(r"height:\s*calc\(100% - 62px\)", css), "Full hero must reserve a strip for image actions."
+assert re.search(r"min-height:\s*410px", css), "Give full-body art a usable viewport."
+
 
 assert not re.search(r"[\u0400-\u04FF]", template), "UI must be fully English."
 assert not re.search(r"[\u0400-\u04FF]", js), "Module code/messages must be English."

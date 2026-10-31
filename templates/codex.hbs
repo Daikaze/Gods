@@ -1,8 +1,8 @@
 <section class="gods-codex">
   <aside class="gods-sidebar">
     <div class="gods-sidebar-title">
-      <div><span class="gods-eyebrow">DIVINE ENCYCLOPEDIA</span><h2><i class="fa-solid fa-book-open"></i> Gods</h2></div>
-      <button type="button" data-action="addGod" class="gods-icon-button" title="Add Deity"><i class="fa-solid fa-plus"></i></button>
+      <h2><i class="fa-solid fa-book-open"></i> Deities</h2>
+      <button type="button" data-action="addGod" class="gods-icon-button" title="Add Deity" aria-label="Add deity"><i class="fa-solid fa-plus"></i></button>
     </div>
     <div class="gods-search-wrap">
       <label class="gods-search"><i class="fa-solid fa-magnifying-glass"></i>
@@ -21,7 +21,7 @@
         {{#if tierHeader}}
           <div class="gods-tier-heading" data-tier="{{divineTier}}">{{divineTier}}</div>
         {{/if}}
-        <button type="button" class="gods-entry {{#if active}}is-active{{/if}}" data-action="selectGod" data-id="{{id}}">
+        <button type="button" class="gods-entry {{#if active}}is-active{{/if}}" data-action="selectGod" data-id="{{id}}" {{#if active}}aria-current="true"{{/if}}>
           <img class="gods-portrait gods-entry-art" src="{{image}}" alt="" loading="lazy">
           <span class="gods-entry-copy"><strong>{{name}}</strong><small>{{title}}</small><em>{{divineTier}}</em></span>
           <i class="fa-solid fa-chevron-right"></i>

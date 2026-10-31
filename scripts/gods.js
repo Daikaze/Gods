@@ -182,7 +182,7 @@ async function ensureDatabase() {
 class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
   static DEFAULT_OPTIONS = {
     id: "gods-divine-codex", classes: ["gods-codex-window"],
-    window: { title: "Gods — Divine Codex", icon: "fa-solid fa-book-open", resizable: true },
+    window: { title: "Gods — Divine Codex", icon: "fa-solid fa-book-open", frame: true, minimizable: true, resizable: true },
     position: { width: 1160, height: 780 },
     actions: {
       selectGod: function (_event, button) { return this.selectGod(button.dataset.id); },
