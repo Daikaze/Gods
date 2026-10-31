@@ -66,10 +66,10 @@ for selector in (
     ".gods-entry-art", ".gods-hero-image-button .gods-hero-art",
     ".gods-image-editor img", ".gods-image-menu-preview"
 ):
-    match = re.search(r"(?m)^\\.gods-codex-window\\s+" + re.escape(selector) + r"\\s*\\{([^}]+)\\}", css)
-    assert match and re.search(r"object-fit:\\s*contain", match.group(1)), "Portrait must use contain: " + selector
-assert re.search(r"height:\\s*calc\\(100% - 62px\\)", css), "Full hero must reserve a strip for image actions."
-assert re.search(r"min-height:\\s*410px", css), "Give full-body art a usable viewport."
+    match = re.search(r"(?m)^\.gods-codex-window\s+" + re.escape(selector) + r"\s*\{([^}]+)\}", css)
+    assert match and re.search(r"object-fit:\s*contain", match.group(1)), "Portrait must use contain: " + selector
+assert re.search(r"height:\s*calc\(100% - 62px\)", css), "Full hero must reserve a strip for image actions."
+assert re.search(r"min-height:\s*410px", css), "Give full-body art a usable viewport."
 
 
 assert not re.search(r"[\u0400-\u04FF]", template), "UI must be fully English."
