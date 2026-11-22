@@ -8,7 +8,7 @@ Searchable, illustrated deity library built for Daikaze's Averis campaign, with 
 
 - **Foundry core:** Version **14.367 or newer**, within generation 14.
 - **Game system:** `dnd5e` **exactly 6.0.6**. This is the D&D 5e game system version, **not** the Foundry build number.
-- Version 0.2.7 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
+- Version 0.2.9 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
 - No new D&D6-only APIs are used; the UI relies on V14 `ApplicationV2` and the standard `JournalEntry` API.
 - Existing Gods records are preserved: updates do **not** replace the GM-private Journal or its edited deity entries.
 
@@ -18,7 +18,7 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.7 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.7/gods-v0.2.7.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.9 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.9/gods-v0.2.9.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
 
