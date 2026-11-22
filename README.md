@@ -1,14 +1,18 @@
 # Gods — Divine Codex
 
-**Foundry VTT V14 (14.367+) + D&D5e system v6.0.6 | GM-only English-language deity encyclopedia**
+**Foundry VTT V14 (14.367+) + D&D5e system v6.0.6–6.1.1 | GM-only English-language deity encyclopedia**
 
 Searchable, illustrated deity library built for Daikaze's Averis campaign, with a separate selection of optional D&D / Forgotten Realms reference profiles. The latter are **examples, not established Averis canon**.
+
+## v0.2.10 — D&D 5e 6.1.1 compatibility
+
+Updated the Foundry V14 manifest and in-game version guard to accept D&D 5e 6.1.1 while retaining 6.0.6 support. Saved deity profiles and private journals are unchanged. Automated regression coverage includes the supported range; live testing in a Foundry V14 world remains recommended.
 
 ## Exact compatibility
 
 - **Foundry core:** Version **14.367 or newer**, within generation 14.
-- **Game system:** `dnd5e` **exactly 6.0.6**. This is the D&D 5e game system version, **not** the Foundry build number.
-- Version 0.2.9 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
+- **Game system:** `dnd5e` **6.0.6 through 6.1.1**. This is the D&D 5e game system version, **not** the Foundry build number.
+- Version 0.2.10 declares these limits in `module.json`, and checks them again on startup and before database operations. Unsupported combinations show a GM warning instead of opening the module.
 - No new D&D6-only APIs are used; the UI relies on V14 `ApplicationV2` and the standard `JournalEntry` API.
 - Existing Gods records are preserved: updates do **not** replace the GM-private Journal or its edited deity entries.
 
@@ -18,7 +22,7 @@ In **Foundry → Add-on Modules → Install Module → Manifest URL**, paste:
 
 `https://raw.githubusercontent.com/Daikaze/Gods/main/module.json`
 
-Alternatively, download the packaged [v0.2.9 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.9/gods-v0.2.9.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
+Alternatively, download the packaged [v0.2.10 ZIP](https://github.com/Daikaze/Gods/releases/download/v0.2.10/gods-v0.2.10.zip). This release archive puts `module.json` at its root, as required for Foundry installation.
 
 Enable **Gods — Divine Codex** in your world. As GM, open **Game Settings → Configure Settings → Module Settings → Gods — Divine Codex → Open Divine Codex** (the exact tab label depends on Foundry's language). As a fallback, run `game.gods.open()` from the browser console.
 
