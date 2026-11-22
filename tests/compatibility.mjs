@@ -1,4 +1,4 @@
-// Version-specific runtime checks using mocked Foundry V14 APIs.
+// Version-specific runtime checks using mocked Foundry V13 APIs.
 // This is not a replacement for manually testing in a live Foundry world.
 import assert from "node:assert/strict";
 
@@ -26,7 +26,7 @@ globalThis.CONST = { DOCUMENT_OWNERSHIP_LEVELS: { NONE: 0 } };
 
 class FakeApplicationV2 {
   constructor() { this.rendered = false; }
-  _canRender() { /* returning undefined allows rendering in V14 */ }
+  _canRender() { /* returning undefined allows rendering in V13 */ }
   async _prepareContext() { return {}; }
   _onRender() {}
   async render() { this.rendered = true; return this; }
@@ -57,9 +57,9 @@ globalThis.foundry = {
 };
 const menus = new Map();
 globalThis.game = {
-  release: { generation: 14 },
-  version: "14.367",
-  system: { id: "dnd5e", version: "6.0.6" },
+  release: { generation: 13 },
+  version: "13.347",
+  system: { id: "dnd5e", version: "5.3.3" },
   user: { isGM: true, id: "test-gm" },
   settings: {
     registerMenu(namespace, key, data) { menus.set(namespace + "." + key, data); }
@@ -97,7 +97,7 @@ assert.equal(typeof callbacks.ready, "function");
 callbacks.init();
 assert.equal(menus.get("gods.openCodex").restricted, true, "Only GMs see menu");
 callbacks.ready();
-assert.equal(game.gods.compatibility().supported, true, "Exact V14/dnd5e 6.0.6 supported");
+assert.equal(game.gods.compatibility().supported, true, "Exact V13/dnd5e 5.3.3 supported");
 assert.equal(typeof events.getSceneControlButtons, "function");
 const controls = { tokens: { name: "tokens", tools: {} } };
 events.getSceneControlButtons(controls);
@@ -266,8 +266,8 @@ assert.doesNotMatch(sentChatMessages[0].content, /NEVER-SHARE-GM-SECRET/);
 
 dialogChoice = "players";
 await picture.deityImageAction();
-assert.equal(imageEvents.at(-1).type, "share", "Native Foundry V14 shareImage called");
-assert.equal(MenuApp.DEFAULT_OPTIONS.window.frame, true, "Native V14 frame");
+assert.equal(imageEvents.at(-1).type, "share", "Native Foundry V13 shareImage called");
+assert.equal(MenuApp.DEFAULT_OPTIONS.window.frame, true, "Native V13 frame");
 assert.equal(MenuApp.DEFAULT_OPTIONS.window.minimizable, true, "Double-click title minimization");
 assert.equal(MenuApp.DEFAULT_OPTIONS.window.resizable, true, "Native resizing");
 dialogChoice = "cancel";
@@ -281,18 +281,18 @@ assert.equal(game.gods.compatibility().supported, false);
 assert.equal(new MenuApp()._canRender({}), false);
 await game.gods.open();
 assert.equal(createCount, 1);
-assert.match(notices.warnings.at(-1), /6\.0\.6/);
+assert.match(notices.warnings.at(-1), /5\.3\.3/);
 
 game.system.version = "5.3.2";
 assert.equal(game.gods.compatibility().supported, false);
-game.system.version = "5.3.3";
+game.system.version = "4.4.4";
 assert.equal(game.gods.compatibility().supported, false, "Old system version must be rejected");
-game.system.version = "6.0.6";
-game.release.generation = 13;
+game.system.version = "5.3.3";
+game.release.generation = 12;
 assert.equal(game.gods.compatibility().supported, false);
 game.release.generation = 15;
 assert.equal(game.gods.compatibility().supported, false);
-game.release.generation = 14;
+game.release.generation = 13;
 game.system.id = "pf2e";
 assert.equal(game.gods.compatibility().supported, false);
 game.system.id = "dnd5e";
@@ -305,4 +305,4 @@ await game.gods.open();
 assert.equal(createCount, 1, "Player cannot create journal");
 assert.equal(notices.errors.length, 0);
 
-console.log("PASS: Foundry V14 + dnd5e 6.0.6; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");
+console.log("PASS: Foundry V13 + dnd5e 5.3.3; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");

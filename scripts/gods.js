@@ -4,9 +4,9 @@ import { POWER_HIERARCHY } from "../data/power-hierarchy.js";
 import { OBSIDIAN_DEITIES } from "../data/obsidian-deities.js";
 
 const MODULE = "gods";
-const SUPPORTED_FOUNDRY_GENERATION = 14;
+const SUPPORTED_FOUNDRY_GENERATION = 13;
 const SUPPORTED_SYSTEM_ID = "dnd5e";
-const SUPPORTED_SYSTEM_VERSION = "6.0.6";
+const SUPPORTED_SYSTEM_VERSION = "5.3.3";
 const DB_NAME = "Gods — GM Database (private)";
 const IMAGE_FALLBACK = "modules/gods/assets/deities/unknown.svg";
 // Power tiers are authoritative to the Obsidian campaign note, not story importance.
@@ -98,7 +98,7 @@ function migrateLegacyRecords(records) {
 }
 
 /**
- * Supported deployment: Foundry VTT generation 14 with D&D 5e system 6.0.6.
+ * Supported deployment: Foundry VTT generation 13 with D&D 5e system 5.3.3.
  * Other system versions may have different behavior and are intentionally blocked.
  */
 function compatibility() {
@@ -115,7 +115,7 @@ function compatibility() {
 const isSupported = () => compatibility().supported;
 const unsupportedMessage = () => {
   const { generation, system, version } = compatibility();
-  return "Gods requires Foundry V14 and D&D5e 6.0.6. Current: Foundry "
+  return "Gods requires Foundry V13 and D&D5e 5.3.3. Current: Foundry "
     + (Number.isFinite(generation) ? "V" + generation : "unknown version")
     + ", " + (system || "unknown system") + " " + (version || "unknown version") + ".";
 };
@@ -209,7 +209,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
     this.search = "";
     this.pantheon = "";
     this.entries = [];
-    // Both columns are independently scrollable. Keep their positions across V14 part rerenders.
+    // Both columns are independently scrollable. Keep their positions across V13 part rerenders.
     this._listScrollTop = 0;
     this._detailScrollTop = 0;
   }
@@ -524,7 +524,7 @@ class GodsCodex extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async openDeityImage(src, title, showPlayers = false) {
     if (!hasAccess() || !isSupported()) return;
-    // Foundry V14 takes ONE options object, unlike legacy ImagePopout versions.
+    // Foundry V13 takes ONE options object, unlike legacy ImagePopout versions.
     const ImagePopout = foundry.applications.apps.ImagePopout;
     const popout = new ImagePopout({ src, window: { title } });
     await popout.render(true);
@@ -606,7 +606,7 @@ async function openCodex() {
   }
 }
 
-// Native Foundry V14 Scene Controls — matching the two-column toolbar.
+// Native Foundry V13 Scene Controls — matching the two-column toolbar.
 Hooks.on("getSceneControlButtons", controls => {
   if (!hasAccess() || !isSupported()) return;
   controls.gods = {
@@ -647,5 +647,5 @@ Hooks.once("ready", () => {
     ui.notifications.warn(unsupportedMessage());
     return;
   }
-  console.info("Gods | Foundry V14 + D&D5e 6.0.6 ready for GM");
+  console.info("Gods | Foundry V13 + D&D5e 5.3.3 ready for GM");
 });
