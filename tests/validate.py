@@ -16,7 +16,8 @@ systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
 assert systems[0]["compatibility"]["minimum"] == "6.0.6"
-assert systems[0]["compatibility"]["maximum"] == "6.1.1"\nassert systems[0]["compatibility"]["verified"] == "6.1.1"
+assert systems[0]["compatibility"]["maximum"] == "6.1.1"
+assert systems[0]["compatibility"]["verified"] == "6.1.1"
 assert manifest["version"]
 for key in ("esmodules", "styles"):
     for path in manifest[key]:
