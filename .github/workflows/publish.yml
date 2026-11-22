@@ -2,7 +2,11 @@ name: Publish Foundry Module
 on:
   push:
     branches: [main]
-    paths: [module.json]
+    paths:
+      - "module.json"
+      - "scripts/**"
+      - "tests/**"
+      - ".github/workflows/publish.yml"
 permissions:
   contents: write
 jobs:
