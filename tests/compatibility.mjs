@@ -291,7 +291,9 @@ assert.match(notices.warnings.at(-1), /6\.0\.6/);
 game.system.version = "5.3.2";
 assert.equal(game.gods.compatibility().supported, false);
 game.system.version = "5.3.3";
-assert.equal(game.gods.compatibility().supported, false, "Old system version must be rejected");
+assert.equal(game.gods.compatibility().supported, true, "V14-compatible 5.3.3 supported");
+game.system.version = "5.4.0";
+assert.equal(game.gods.compatibility().supported, false, "Untested intermediate version rejected");
 game.system.version = "6.0.6";
 game.release.generation = 13;
 assert.equal(game.gods.compatibility().supported, false);
@@ -310,4 +312,4 @@ await game.gods.open();
 assert.equal(createCount, 1, "Player cannot create journal");
 assert.equal(notices.errors.length, 0);
 
-console.log("PASS: Foundry V14 + dnd5e 6.0.6–6.1.1; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");
+console.log("PASS: Foundry V14 + dnd5e 5.3.3 / 6.0.6–6.1.1; scene-controls icon GM-only; deity scroll persists; Obsidian power hierarchy and migration verified; incompatible versions blocked.");

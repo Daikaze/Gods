@@ -19,6 +19,8 @@ const compareSystemVersion = (a, b) => {
   return 0;
 };
 const supportedDnd5eVersion = version => {
+  // The 5.3.3 release supports Foundry V14; do not permit untested 5.4.x or 6.0.x automatically.
+  if (version === "5.3.3") return true;
   const minimum = compareSystemVersion(version, SUPPORTED_SYSTEM_MIN_VERSION);
   const maximum = compareSystemVersion(version, SUPPORTED_SYSTEM_MAX_VERSION);
   return minimum !== null && maximum !== null && minimum >= 0 && maximum <= 0;
@@ -114,7 +116,7 @@ function migrateLegacyRecords(records) {
 }
 
 /**
- * Supported deployment: Foundry VTT generation 14 with D&D 5e system 6.0.6–6.1.1.
+ * Supported deployment: Foundry VTT generation 14 with D&D 5e system 5.3.3 or 6.0.6–6.1.1.
  * Other system versions may have different behavior and are intentionally blocked.
  */
 function compatibility() {
@@ -131,7 +133,7 @@ function compatibility() {
 const isSupported = () => compatibility().supported;
 const unsupportedMessage = () => {
   const { generation, system, version } = compatibility();
-  return "Gods requires Foundry V14 and D&D5e 6.0.6–6.1.1. Current: Foundry "
+  return "Gods requires Foundry V14 and D&D5e 5.3.3 or 6.0.6–6.1.1. Current: Foundry "
     + (Number.isFinite(generation) ? "V" + generation : "unknown version")
     + ", " + (system || "unknown system") + " " + (version || "unknown version") + ".";
 };
@@ -663,5 +665,5 @@ Hooks.once("ready", () => {
     ui.notifications.warn(unsupportedMessage());
     return;
   }
-  console.info("Gods | Foundry V14 + D&D5e 6.0.6–6.1.1 ready for GM");
+  console.info("Gods | Foundry V14 + D&D5e 5.3.3 / 6.0.6–6.1.1 ready for GM");
 });

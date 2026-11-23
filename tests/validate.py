@@ -15,7 +15,7 @@ assert manifest["download"] == f'https://github.com/Daikaze/Gods/releases/downlo
 systems = manifest["relationships"]["systems"]
 assert len(systems) == 1 and systems[0]["id"] == "dnd5e"
 assert systems[0]["type"] == "system"
-assert systems[0]["compatibility"]["minimum"] == "6.0.6"
+assert systems[0]["compatibility"]["minimum"] == "5.3.3"
 assert systems[0]["compatibility"]["maximum"] == "6.1.1"
 assert systems[0]["compatibility"]["verified"] == "6.1.1"
 assert manifest["version"]

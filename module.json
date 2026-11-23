@@ -1,8 +1,8 @@
 {
   "id": "gods",
   "title": "Gods — Divine Codex",
-  "description": "GM-only Divine Codex for Foundry V14 (14.367+) and D&D5e 6.0.6 with native Foundry interface, full uncropped portraits, 53 deity profiles, divine power hierarchy and image sharing.",
-  "version": "0.2.10",
+  "description": "GM-only Divine Codex for Foundry V14 and D&D 5e 5.3.3 or 6.0.6–6.1.1; searchable deity profiles, private campaign lore and image sharing.",
+  "version": "0.2.11",
   "authors": [
     {
       "name": "Daikaze"
@@ -21,14 +21,14 @@
   ],
   "url": "https://github.com/Daikaze/Gods",
   "manifest": "https://raw.githubusercontent.com/Daikaze/Gods/main/module.json",
-  "download": "https://github.com/Daikaze/Gods/releases/download/v0.2.10/gods-v0.2.10.zip",
+  "download": "https://github.com/Daikaze/Gods/releases/download/v0.2.11/gods-v0.2.11.zip",
   "relationships": {
     "systems": [
       {
         "id": "dnd5e",
         "type": "system",
         "compatibility": {
-          "minimum": "6.0.6",
+          "minimum": "5.3.3",
           "maximum": "6.1.1",
           "verified": "6.1.1"
         }
